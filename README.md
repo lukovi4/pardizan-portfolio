@@ -63,6 +63,25 @@ intro: Абзац на карточке.
 
 Пуш в `main` запускает сборку и публикацию (`.github/workflows/deploy.yml`).
 
-Пока домен не подключён, сайт собирается с префиксом `/pardizan-portfolio/`.
-После подключения `pardizan.com` задать переменные репозитория
-`SITE_BASE=/` и `SITE_URL=https://pardizan.com`.
+Пока домен не подключён, сайт живёт на `lukovi4.github.io/pardizan-portfolio/`
+и собирается с префиксом `/pardizan-portfolio/`.
+
+### Переключение на pardizan.com
+
+Порядок важен: сначала DNS, потом код — иначе сайт временно ляжет.
+
+1. **DNS** (GoDaddy). Сменить NS с `ns1/ns2.tildadns.com` на дефолтные GoDaddy,
+   затем добавить записи:
+   - четыре `A` для apex `@`: `185.199.108.153`, `185.199.109.153`,
+     `185.199.110.153`, `185.199.111.153`;
+   - `CNAME` для `www` → `lukovi4.github.io`.
+2. **Код**: положить `public/CNAME` с одной строкой `pardizan.com`; задать
+   переменные репозитория `SITE_BASE=/` и `SITE_URL=https://pardizan.com`;
+   запушить. Пути станут корневыми.
+3. **GitHub**: Settings → Pages → Custom domain = `pardizan.com`, дождаться
+   проверки DNS, включить **Enforce HTTPS**.
+4. Проверить, что `https://pardizan.com/terms_conditions` отдаёт 200 — это
+   ссылка из карточки Lastik в Google Play.
+
+После шага 2 превью-URL `lukovi4.github.io/pardizan-portfolio/` перестанет
+работать (пути корневые) — это ожидаемо.
