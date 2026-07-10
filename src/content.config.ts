@@ -48,6 +48,9 @@ const projects = defineCollection({
       intro: z.string(),
       logo: image().optional(),
       cover: image().optional(),
+      // Kinescope video ID для обложки на главной (Animi, Lastik).
+      // Постер-картинка (cover) показывается, пока видео грузится.
+      coverVideo: z.string().optional(),
       stores: z
         .object({
           appStore: z.string().url().optional(),
