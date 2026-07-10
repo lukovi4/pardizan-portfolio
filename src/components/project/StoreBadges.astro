@@ -1,0 +1,51 @@
+---
+import { Image } from 'astro:assets';
+import appStoreBadge from '../../assets/badges/app-store.svg';
+import googlePlayBadge from '../../assets/badges/google-play.png';
+
+interface Props {
+  stores: { appStore?: string; googlePlay?: string };
+}
+const { stores } = Astro.props;
+---
+
+<div class="badges">
+  {
+    stores.appStore && (
+      <a href={stores.appStore} target="_blank" rel="noopener noreferrer">
+        <img src={appStoreBadge.src} alt="Download on the App Store" height="40" />
+      </a>
+    )
+  }
+  {
+    stores.googlePlay && (
+      <a href={stores.googlePlay} target="_blank" rel="noopener noreferrer">
+        <Image src={googlePlayBadge} alt="Get it on Google Play" height={40} />
+      </a>
+    )
+  }
+</div>
+
+<style>
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+  }
+
+  .badges a {
+    display: block;
+    transition: opacity var(--duration) var(--ease);
+  }
+
+  .badges a:hover {
+    opacity: 0.8;
+  }
+
+  .badges img {
+    height: 40px;
+    width: auto;
+  }
+</style>

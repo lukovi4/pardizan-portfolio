@@ -1,0 +1,29 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import ProjectLayout from '../layouts/ProjectLayout.astro';
+import Section from '../components/mdx/Section.astro';
+import Figure from '../components/mdx/Figure.astro';
+import Gallery from '../components/mdx/Gallery.astro';
+import Note from '../components/mdx/Note.astro';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects', ({ data }) => !data.draft);
+  return projects.map((project) => ({
+    params: { project: project.data.slug },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+
+const settings = await getEntry('site', 'settings');
+const gated = settings!.data.mobileGateEnabled;
+
+// Компоненты, доступные в теле MDX-кейса.
+const components = { Section, Figure, Gallery, Note };
+---
+
+<ProjectLayout project={project} gated={gated}>
+  <Content components={components} />
+</ProjectLayout>

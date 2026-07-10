@@ -1,0 +1,38 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  src: ImageMetadata;
+  alt?: string;
+  caption?: string;
+}
+const { src, alt = '', caption } = Astro.props;
+---
+
+<figure class="figure reveal">
+  <Image src={src} alt={alt} widths={[740, 1480]} sizes="(max-width: 900px) 100vw, 740px" loading="lazy" />
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .figure {
+    max-width: var(--col-body);
+    margin-inline: auto;
+    margin-block: var(--space-6);
+  }
+
+  .figure :global(img) {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius);
+    background: var(--color-surface);
+  }
+
+  figcaption {
+    margin-top: var(--space-3);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    text-align: center;
+  }
+</style>

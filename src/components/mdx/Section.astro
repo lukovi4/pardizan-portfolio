@@ -1,0 +1,45 @@
+---
+// Секция кейса: заголовок в узкой колонке слева, текст в широкой справа —
+// как в оригинале (сетка 200px + 740px).
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+---
+
+<section class="section reveal">
+  <h2>{title}</h2>
+  <div class="body">
+    <slot />
+  </div>
+</section>
+
+<style>
+  .section {
+    display: grid;
+    grid-template-columns: minmax(0, var(--col-label)) minmax(0, var(--col-body));
+    gap: var(--space-8);
+    padding-block: var(--space-8);
+  }
+
+  h2 {
+    font-size: var(--text-lg);
+    font-weight: 600;
+  }
+
+  .body :global(p) {
+    margin-bottom: var(--space-4);
+  }
+
+  .body :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 900px) {
+    .section {
+      grid-template-columns: 1fr;
+      gap: var(--space-3);
+      padding-block: var(--space-6);
+    }
+  }
+</style>

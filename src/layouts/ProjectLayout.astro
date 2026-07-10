@@ -1,0 +1,58 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from './BaseLayout.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import MobileGate from '../components/layout/MobileGate.astro';
+import CaseHero from '../components/project/CaseHero.astro';
+import { getEntry } from 'astro:content';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  gated: boolean;
+}
+const { project, gated } = Astro.props;
+const { title, intro, seo } = project.data;
+
+const home = await getEntry('home', 'home');
+const backHref = import.meta.env.BASE_URL;
+---
+
+<BaseLayout title={title} description={seo?.description ?? intro}>
+  <Header homeLink label={home!.data.name} />
+
+  <main id="main">
+    <CaseHero project={project} />
+
+    {gated && <MobileGate />}
+
+    <div class="container case-body" class:list={[{ 'desktop-only': gated }]}>
+      <slot />
+    </div>
+
+    <div class="container back">
+      <a href={backHref}>← All projects</a>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .case-body {
+    padding-block: var(--space-8);
+  }
+
+  .back {
+    padding-block: var(--space-16) 0;
+  }
+
+  .back a {
+    color: var(--color-text-muted);
+    transition: color var(--duration) var(--ease);
+  }
+
+  .back a:hover {
+    color: var(--color-text);
+  }
+</style>

@@ -1,0 +1,19 @@
+---
+// Сноска со звёздочкой (в кейсе Animi). Мелкий кегль, вторичный цвет.
+---
+
+<p class="note reveal">
+  <slot />
+</p>
+
+<style>
+  .note {
+    max-width: var(--col-body);
+    margin-inline: auto;
+    margin-block: var(--space-4);
+    padding-left: var(--space-4);
+    border-left: 2px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+</style>
