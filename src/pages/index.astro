@@ -1,13 +1,8 @@
 ---
-import { getEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import HomeA from '../components/home/variant-a/HomeA.astro';
-import HomeB from '../components/home/variant-b/HomeB.astro';
-
-const settings = await getEntry('site', 'settings');
-const variant = settings!.data.activeHomeVariant;
 ---
 
-<BaseLayout variant={variant}>
-  {variant === 'a' ? <HomeA /> : <HomeB />}
+<BaseLayout>
+  <HomeA />
 </BaseLayout>

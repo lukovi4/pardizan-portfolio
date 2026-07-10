@@ -4,7 +4,6 @@ import { Font } from 'astro:assets';
 import { getEntry } from 'astro:content';
 
 import '../styles/tokens.css';
-import '../styles/tokens.variant-b.css';
 import '../styles/global.css';
 import '../styles/animations.css';
 
@@ -12,8 +11,6 @@ interface Props {
   title?: string;
   description?: string;
   noindex?: boolean;
-  /** Вариант токенов: 'a' | 'b'. Задаётся страницами превью. */
-  variant?: 'a' | 'b';
 }
 
 const settings = await getEntry('site', 'settings');
@@ -23,7 +20,6 @@ const {
   title = seo.title,
   description = seo.description,
   noindex = false,
-  variant,
 } = Astro.props;
 
 const pageTitle = title === seo.title ? title : `${title} — ${seo.title}`;
@@ -41,7 +37,7 @@ const withBase = (path: string) =>
 ---
 
 <!doctype html>
-<html lang="en" data-variant={variant}>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

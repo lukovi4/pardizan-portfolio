@@ -50,7 +50,6 @@ intro: Абзац на карточке.
 
 - `mobileGateEnabled` — `true` прячет кейсы на телефонах за заглушкой «open from desktop»,
   как было на Tilda. `false` — полноценный адаптив.
-- `activeHomeVariant` — какой вариант главной показывать (`a` или `b`).
 
 ## Важно про URL
 

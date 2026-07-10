@@ -7,8 +7,6 @@ const site = defineCollection({
     // Прячет кейсы на мобильных за заглушкой, как это делает Tilda.
     // false = полноценный адаптив.
     mobileGateEnabled: z.boolean(),
-    // Какой вариант главной боевой, пока не выбран финальный.
-    activeHomeVariant: z.enum(['a', 'b']),
     seo: z.object({
       title: z.string(),
       description: z.string(),
