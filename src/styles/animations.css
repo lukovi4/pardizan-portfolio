@@ -1,0 +1,63 @@
+/* Появление блоков при скролле.
+
+   Порядок деградации:
+   1. Есть scroll-driven animations (Chrome/Edge) — работает на чистом CSS.
+   2. Нет, но есть JS — IntersectionObserver ставит .is-visible (см. BaseLayout).
+   3. Нет ни того, ни другого — контент просто виден.
+
+   Поэтому базовое состояние .reveal — видимое. Прячем только там,
+   где точно сможем показать обратно. */
+
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: reveal-in linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 22%;
+  }
+}
+
+/* Фолбэк: класс ставится скриптом, поэтому прячем только при наличии JS. */
+@supports not (animation-timeline: view()) {
+  html.js .reveal {
+    opacity: 0;
+    transform: translateY(1.25rem);
+    transition:
+      opacity var(--duration) var(--ease),
+      transform var(--duration) var(--ease);
+  }
+
+  html.js .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Переходы между страницами. */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--duration);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  html.js .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+}

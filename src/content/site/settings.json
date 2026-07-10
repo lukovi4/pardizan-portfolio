@@ -1,0 +1,16 @@
+{
+  "settings": {
+    "mobileGateEnabled": false,
+    "activeHomeVariant": "a",
+    "seo": {
+      "title": "Lukovich Evgeny",
+      "description": "Product designer with over 10 years of experience"
+    },
+    "links": {
+      "telegram": "https://t.me/pardizan",
+      "linkedin": "https://www.linkedin.com/in/evgeny-lukovich/",
+      "email": "lukovich.jenya@gmail.com",
+      "resume": "https://docs.google.com/document/d/1zNpJHzvRX7IJsWU8S2eXSUVBUh9MZVcg6qgZ_7i4NWk/edit?usp=sharing"
+    }
+  }
+}
