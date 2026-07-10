@@ -1,0 +1,119 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import Header from '../../layout/Header.astro';
+import Footer from '../../layout/Footer.astro';
+import MobileGate from '../../layout/MobileGate.astro';
+import ProjectCard from '../ProjectCard.astro';
+
+const settings = await getEntry('site', 'settings');
+const home = await getEntry('home', 'home');
+const { headline, facts, projectOrder } = home!.data;
+const { Content } = await render(home!);
+
+const all = await getCollection('projects', ({ data }) => !data.draft);
+const projects = projectOrder
+  .map((slug) => all.find((p) => p.data.slug === slug))
+  .filter((p): p is (typeof all)[number] => Boolean(p));
+
+const gated = settings!.data.mobileGateEnabled;
+---
+
+<Header />
+
+<main id="main">
+  <section class="container hero">
+    <div class="lead">
+      <h1>{headline}</h1>
+      <div class="bio"><Content /></div>
+    </div>
+
+    <dl class="facts">
+      {
+        facts.map((fact) => (
+          <div>
+            <dt>{fact.label}</dt>
+            <dd>{fact.value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+
+  {gated && <MobileGate />}
+
+  <section class="container projects" class:list={[{ 'desktop-only': gated }]}>
+    <h2>Selected projects</h2>
+    <div class="grid">
+      {
+        projects.map((project, i) => (
+          <ProjectCard project={project} offset={i % 2 === 0} loading={i < 2 ? 'eager' : 'lazy'} />
+        ))
+      }
+    </div>
+  </section>
+</main>
+
+<Footer />
+
+<style>
+  /* Полоса оригинала: широкая колонка текста + узкая колонка фактов. */
+  .hero {
+    display: grid;
+    gap: var(--space-12);
+    padding-block: var(--space-8) var(--space-24);
+    grid-template-columns: minmax(0, var(--col-body)) minmax(0, 1fr);
+  }
+
+  h1 {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    margin-bottom: var(--space-8);
+  }
+
+  .bio :global(p) {
+    max-width: 68ch;
+  }
+
+  .facts {
+    display: grid;
+    gap: var(--space-6);
+    align-content: start;
+  }
+
+  dt {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  .projects h2 {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-12);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-16) var(--space-8);
+  }
+
+  @media (max-width: 900px) {
+    .hero {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+      padding-block: var(--space-4) var(--space-16);
+    }
+
+    .facts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-12);
+    }
+  }
+</style>

@@ -1,0 +1,59 @@
+---
+import { getEntry } from 'astro:content';
+import SocialLinks from './SocialLinks.astro';
+
+interface Props {
+  /** На страницах кейсов шапка ведёт обратно на главную. */
+  homeLink?: boolean;
+  /** Что показать слева вместо имени (название кейса). */
+  label?: string;
+}
+
+const { homeLink = false, label } = Astro.props;
+
+const home = await getEntry('home', 'home');
+const name = label ?? home!.data.name;
+const base = import.meta.env.BASE_URL;
+---
+
+<header class="header">
+  <div class="container inner">
+    {
+      homeLink ? (
+        <a href={base} class="name">
+          {name}
+        </a>
+      ) : (
+        <span class="name">{name}</span>
+      )
+    }
+    <SocialLinks />
+  </div>
+</header>
+
+<style>
+  .header {
+    padding-block: var(--space-6);
+  }
+
+  .inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+  }
+
+  .name {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    view-transition-name: site-name;
+  }
+
+  a.name {
+    transition: opacity var(--duration) var(--ease);
+  }
+
+  a.name:hover {
+    opacity: 0.55;
+  }
+</style>

@@ -1,0 +1,63 @@
+---
+import { getEntry } from 'astro:content';
+
+const settings = await getEntry('site', 'settings');
+const { telegram, linkedin, email, resume } = settings!.data.links;
+---
+
+<nav class="social" aria-label="Contacts">
+  <a href={resume} target="_blank" rel="noopener noreferrer" class="resume">Resume</a>
+
+  <a href={`mailto:${email}`} aria-label="Email">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="2.5" y="4.5" width="19" height="15" rx="2.5" stroke="currentColor" stroke-width="1.6" />
+      <path d="M3 6.5 12 13l9-6.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+    </svg>
+  </a>
+
+  <a href={linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9.5h4v11H3v-11ZM9.5 9.5h3.8v1.5h.05c.53-.95 1.83-1.95 3.77-1.95 4.03 0 4.78 2.5 4.78 5.76v5.69h-4v-5.05c0-1.2-.02-2.75-1.75-2.75-1.76 0-2.03 1.3-2.03 2.66v5.14h-4v-11Z" />
+    </svg>
+  </a>
+
+  <a href={telegram} target="_blank" rel="noopener noreferrer" aria-label="Telegram">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M21.7 3.4 2.9 10.7c-1.1.42-1.1 1.05-.2 1.32l4.8 1.5 1.85 5.66c.22.6.4.83.83.83.42 0 .6-.19.83-.42l2.3-2.24 4.78 3.53c.88.49 1.5.24 1.72-.81l3.1-14.6c.32-1.29-.49-1.87-1.31-1.5Zm-2.9 3.1-8.62 7.85-.34 3.6-1.7-5.26 10.66-6.19Z" />
+    </svg>
+  </a>
+</nav>
+
+<style>
+  .social {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .social a {
+    display: grid;
+    place-items: center;
+    color: var(--color-text);
+    transition: opacity var(--duration) var(--ease);
+  }
+
+  .social a:hover {
+    opacity: 0.55;
+  }
+
+  .social svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .resume {
+    font-size: var(--text-sm);
+    margin-inline-end: var(--space-2);
+  }
+
+  .resume:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>

@@ -1,18 +1,13 @@
 ---
-import { getEntry, render } from 'astro:content';
+import { getEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import HomeA from '../components/home/variant-a/HomeA.astro';
+import HomeB from '../components/home/variant-b/HomeB.astro';
 
-const home = await getEntry('home', 'home');
-const { name, headline } = home!.data;
-const { Content } = await render(home!);
+const settings = await getEntry('site', 'settings');
+const variant = settings!.data.activeHomeVariant;
 ---
 
-<BaseLayout>
-  <main id="main" class="container">
-    <h1>{name}</h1>
-    <p>{headline}</p>
-    <div class="reveal">
-      <Content />
-    </div>
-  </main>
+<BaseLayout variant={variant}>
+  {variant === 'a' ? <HomeA /> : <HomeB />}
 </BaseLayout>
