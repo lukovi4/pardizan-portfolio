@@ -26,15 +26,26 @@ export default defineConfig({
     }),
   ],
 
+  // Шрифты скачиваются при сборке и самохостятся — внешних запросов на сайте нет.
   fonts: [
     {
       provider: fontProviders.google(),
-      name: 'Poppins',
-      cssVariable: '--font-poppins',
-      weights: [400, 600, 700],
+      name: 'Geist',
+      cssVariable: '--font-sans',
+      weights: ['400 700'],
       styles: ['normal'],
       subsets: ['latin'],
-      fallbacks: ['Arial', 'sans-serif'],
+      fallbacks: ['system-ui', 'sans-serif'],
+      display: 'swap',
+    },
+    {
+      provider: fontProviders.google(),
+      name: 'Geist Mono',
+      cssVariable: '--font-mono',
+      weights: [400, 500],
+      styles: ['normal'],
+      subsets: ['latin'],
+      fallbacks: ['ui-monospace', 'monospace'],
       display: 'swap',
     },
   ],

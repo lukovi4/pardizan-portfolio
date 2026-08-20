@@ -1,6 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content';
-import LegalLayout from '../layouts/LegalLayout.astro';
+import Base from '../layouts/Base.astro';
 
 export async function getStaticPaths() {
   const entries = await getCollection('legal');
@@ -13,8 +13,49 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content } = await render(entry);
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
-<LegalLayout entry={entry}>
-  <Content />
-</LegalLayout>
+<Base title={entry.data.title} noindex>
+  <main class="legal">
+    <a class="home" href={`${base}/`}>← pardizan.com</a>
+    <article>
+      <Content />
+    </article>
+  </main>
+</Base>
+
+<style>
+  .legal {
+    max-width: 44rem;
+    margin: 0 auto;
+    padding: 3rem var(--gutter) 6rem;
+  }
+
+  .home {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .home:hover {
+    color: var(--ink);
+  }
+
+  article {
+    margin-top: 3rem;
+  }
+
+  article :global(p),
+  article :global(ul) {
+    margin-bottom: 1rem;
+  }
+
+  article :global(hr) {
+    border: 0;
+    border-top: 1px solid var(--line);
+    margin: 2rem 0;
+  }
+</style>

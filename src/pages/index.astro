@@ -1,8 +1,41 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import HomeA from '../components/home/variant-a/HomeA.astro';
+import Base from '../layouts/Base.astro';
 ---
 
-<BaseLayout>
-  <HomeA />
-</BaseLayout>
+<Base
+  title="Evgeny Lukovich — Product Designer"
+  description="Senior product designer with 10+ years of experience: growth, monetization, onboarding, and complex product systems."
+>
+  <main class="hero">
+    <p class="meta">pardizan.com</p>
+    <h1>Evgeny Lukovich</h1>
+    <p class="sub">Product Designer · AI-assisted Product Execution</p>
+  </main>
+</Base>
+
+<style>
+  .hero {
+    max-width: var(--page-max);
+    margin: 0 auto;
+    padding: 6rem var(--gutter);
+  }
+
+  .meta {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+
+  h1 {
+    margin-top: 1rem;
+    font-weight: 600;
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+  }
+
+  .sub {
+    margin-top: 1rem;
+    color: var(--muted);
+  }
+</style>
