@@ -20,9 +20,9 @@ export default defineConfig({
   integrations: [
     mdx(),
     sitemap({
-      // Юридические страницы не индексируем.
-      filter: (page) =>
-        !/(privacy-policy|terms-service|terms_conditions|images_copyright)/.test(page),
+      // Юридические страницы не индексируем. Шаблон общий, а не перечень
+      // слагов: новая легалка закрывается сама, без правки конфига.
+      filter: (page) => !/(privacy-policy|terms|images_copyright)/.test(page),
     }),
   ],
 

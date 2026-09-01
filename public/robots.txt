@@ -3,8 +3,7 @@ Allow: /
 
 # Юридические страницы приложений — не для индексации.
 Disallow: /privacy-policy-
-Disallow: /terms-service-
-Disallow: /terms_conditions
+Disallow: /terms
 Disallow: /images_copyright
 
 Sitemap: https://pardizan.com/sitemap-index.xml
