@@ -1,0 +1,132 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { name, slug, summary, roles, years, role, links } = project.data;
+
+// Поля карточки: подпись слева, значение справа
+const fields = [
+  years && { label: 'Years', value: years },
+  role && { label: 'Role', value: role },
+  roles?.length && { label: 'Scope', value: roles.join(', ') },
+].filter(Boolean) as { label: string; value: string }[];
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<div class="info">
+  <h3>{name}</h3>
+  {summary && <p class="summary">{summary}</p>}
+
+  <dl class="fields">
+    {
+      fields.map((field) => (
+        <div class="field">
+          <dt>{field.label}</dt>
+          <dd>{field.value}</dd>
+        </div>
+      ))
+    }
+    {
+      links?.length && (
+        <div class="field">
+          <dt>Media</dt>
+          <dd class="links">
+            {links.map((link) => (
+              <a href={link.url} target="_blank" rel="noopener">
+                {link.label} <span aria-hidden="true">↗</span>
+              </a>
+            ))}
+          </dd>
+        </div>
+      )
+    }
+  </dl>
+
+  <a class="btn" href={`${base}/${slug}`}>See case <span aria-hidden="true">→</span></a>
+</div>
+
+<style>
+  .info {
+    /* Ширину и высоту карточки задаёт родительский кейс. */
+    width: var(--info-w);
+    height: var(--cell-h);
+    display: flex;
+    flex-direction: column;
+    padding: 40px;
+    /* Фон страницы стал белым, поэтому карточка держится на едва заметной
+       подложке — иначе описание сливалось бы с фоном. */
+    background: var(--surface);
+    border-radius: 14px;
+  }
+
+  h3 {
+    font-weight: 600;
+    font-size: 1.35rem;
+    letter-spacing: -0.015em;
+    line-height: 1.15;
+  }
+
+  .summary {
+    margin-top: 0.7rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  /* Поля кейса: слева подпись, справа значение, строки разделены линиями */
+  .fields {
+    margin: 1.75rem 0 0;
+  }
+
+  .field {
+    display: grid;
+    grid-template-columns: minmax(0, 5rem) minmax(0, 1fr);
+    gap: 1rem;
+    align-items: baseline;
+    padding-block: 0.7rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .field:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  dt {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #222;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+  }
+
+  .links a {
+    text-decoration: none;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .links a:hover {
+    border-color: var(--accent-ink);
+    color: var(--accent-ink);
+  }
+
+  /* Кнопка прижата к низу карточки */
+  .btn {
+    margin-top: auto;
+    justify-content: center;
+    font-size: 0.95rem;
+  }
+</style>

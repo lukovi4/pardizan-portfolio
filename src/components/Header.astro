@@ -1,0 +1,70 @@
+---
+import { getEntry } from 'astro:content';
+
+const home = await getEntry('home', 'home');
+if (!home) throw new Error('src/content/home/home.md не найден');
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<header class="site-header">
+  <div class="shell inner">
+    <a class="wordmark" href={`${base}/`}>Evgeny Lukovich</a>
+    <nav aria-label="Main">
+      <a href={`${base}/#cases`}>Work</a>
+      <a href={`${base}/#experience`}>Experience</a>
+      <a href={`${base}/#about`}>About</a>
+      <a href={home.data.links.resume} target="_blank" rel="noopener">CV</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    /* Скроллится .scroller, а не страница, поэтому шапка фиксированная */
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 10;
+    background: color-mix(in srgb, var(--paper) 90%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    height: 3.75rem;
+  }
+
+  .wordmark {
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+  }
+
+  nav {
+    display: flex;
+    gap: clamp(1rem, 3vw, 1.75rem);
+  }
+
+  nav a {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    padding-block: 0.35rem;
+  }
+
+  nav a:hover {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--brand);
+    text-decoration-thickness: 3px;
+    text-underline-offset: 6px;
+  }
+</style>

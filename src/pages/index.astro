@@ -1,41 +1,373 @@
 ---
+import { getCollection, getEntry, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import ProjectShowcase from '../components/ProjectShowcase.astro';
+
+const home = await getEntry('home', 'home');
+if (!home) throw new Error('src/content/home/home.md не найден');
+const { Content: About } = await render(home);
+
+const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+const { headline, intro, companies, strengths, facts, experience } = home.data;
+
+// «Vimeo, NerdWallet, AppLovin, and DeoVR.» — с точкой в конце
+const companyParts = companies.map((name, i) => ({
+  name,
+  sep: i === companies.length - 1 ? '.' : i === companies.length - 2 ? ', and ' : ', ',
+}));
+
+// Финальный знак заголовка — красным: «…who ships[.]»
+const punct = headline.match(/^(.*?)([.?!])$/);
+const headText = punct ? punct[1] : headline;
+const headMark = punct ? punct[2] : '';
+
+const workRange = `01–${String(projects.length).padStart(2, '0')}`;
+
+// Старая сетка карточек скрыта: её заменили кейсы с лентами скринов.
+// Вернуть — поставить true.
+const showWorkGrid = false;
+
+// Блок с лентой скринов показываем только у кейсов, где скрины уже подготовлены.
+const cases = projects.filter((project) => project.data.screens?.length);
 ---
 
 <Base
   title="Evgeny Lukovich — Product Designer"
-  description="Senior product designer with 10+ years of experience: growth, monetization, onboarding, and complex product systems."
+  description="Senior product designer with 10+ years across Vimeo, NerdWallet, AppLovin, and DeoVR — growth, monetization, onboarding, and complex product systems."
 >
-  <main class="hero">
-    <p class="meta">pardizan.com</p>
-    <h1>Evgeny Lukovich</h1>
-    <p class="sub">Product Designer · AI-assisted Product Execution</p>
+  <Header />
+
+  <main class="scroller">
+    <section class="hero screen shell">
+      <h1>{headText}<span class="mark">{headMark}</span></h1>
+      <p class="sub">
+        {intro}{' '}
+        {companyParts.map(({ name, sep }) => <Fragment><strong>{name}</strong>{sep}</Fragment>)}
+      </p>
+    </section>
+
+    {
+      showWorkGrid && (
+        <section id="work" class="work shell">
+          <div class="section-head">
+            <h2>Selected work</h2>
+            <span class="cap">{workRange}</span>
+          </div>
+          <div class="grid">
+            {projects.map((project, i) => (
+              <ProjectCard project={project} index={i} />
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    {cases.map((project, i) => <ProjectShowcase project={project} anchor={i === 0 ? 'cases' : undefined} />)}
+
+    <section id="strengths" class="strengths screen shell">
+      <div class="section-head">
+        <h2>Core strengths</h2>
+        <span class="cap">01–{String(strengths.length).padStart(2, '0')}</span>
+      </div>
+      <ol>
+        {
+          strengths.map((s) => (
+            <li data-reveal>
+              <h3>{s.title}</h3>
+              <p>{s.description}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section id="experience" class="experience screen shell">
+      <div class="section-head">
+        <h2>Experience</h2>
+        <span class="cap">01–{String(experience.length).padStart(2, '0')}</span>
+      </div>
+      <ol>
+        {
+          experience.map((e) => (
+            <li>
+              <div class="post">
+                <h3>{e.role}</h3>
+                {e.company && <p class="company">{e.company}</p>}
+                <p class="period cap">{e.period}</p>
+              </div>
+              <ul class="points">
+                {e.description.map((point) => (
+                  <li>{point}</li>
+                ))}
+              </ul>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section id="about" class="about screen shell">
+      <div class="section-head">
+        <h2>About</h2>
+      </div>
+      <div class="bio" data-reveal>
+        <About />
+        <dl class="facts">
+          {
+            facts.map((f) => (
+              <div class="fact">
+                <dt class="cap">{f.label}</dt>
+                <dd>{f.value}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+    </section>
+    <Footer />
   </main>
 </Base>
 
 <style>
+  /* ---------- Hero ---------- */
   .hero {
-    max-width: var(--page-max);
-    margin: 0 auto;
-    padding: 6rem var(--gutter);
+    position: relative;
+    padding-block: clamp(4rem, 11vw, 7.5rem) clamp(3rem, 8vw, 5.5rem);
   }
 
-  .meta {
+  /* Крестики-миры, как в макетной сетке */
+  .hero::before,
+  .hero::after {
+    content: '+';
+    position: absolute;
     font-family: var(--font-mono);
-    font-size: 0.8125rem;
+    font-size: 0.9rem;
     color: var(--muted);
+    opacity: 0.55;
+  }
+
+  .hero::before {
+    top: 1.4rem;
+    right: var(--gutter);
+  }
+
+  .hero::after {
+    bottom: 1.2rem;
+    left: var(--gutter);
   }
 
   h1 {
-    margin-top: 1rem;
     font-weight: 600;
-    font-size: clamp(2.5rem, 8vw, 5rem);
-    line-height: 1.05;
-    letter-spacing: -0.035em;
+    font-size: clamp(3rem, 9vw, 7rem);
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+    max-width: 12ch;
+  }
+
+  .mark {
+    color: var(--accent);
   }
 
   .sub {
-    margin-top: 1rem;
+    margin-top: 1.5rem;
+    max-width: 34rem;
+    font-size: 1.05rem;
     color: var(--muted);
+  }
+
+  .sub strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  /* ---------- Заголовки секций ---------- */
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-top: 1px solid var(--line);
+    padding-top: 1rem;
+    margin-bottom: clamp(2rem, 5vw, 3rem);
+  }
+
+  .section-head h2 {
+    font-weight: 600;
+    font-size: clamp(1.5rem, 3vw, 2.1rem);
+    letter-spacing: -0.02em;
+  }
+
+  .work,
+  .strengths,
+  .experience,
+  .about {
+    padding-block: calc(var(--header-h) + 1.5rem) 2.5rem;
+  }
+
+  /* Опыт длиннее экрана — и это нормально: спецификация требует игнорировать
+     точки привязки, из-за которых контент стал бы недостижимым. Секция просто
+     прокручивается целиком, а следующий экран примагничивается на её границе. */
+
+  /* ---------- Work: ровная сетка в две колонки ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(2.5rem, 6vw, 4.5rem) clamp(1.5rem, 3.5vw, 2.5rem);
+  }
+
+  /* ---------- Core strengths ---------- */
+  .strengths ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .strengths li {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: 0.5rem 2rem;
+    align-items: baseline;
+    padding-block: 1.4rem;
+    border-bottom: 1px solid var(--line);
+    transition: background 0.2s ease;
+  }
+
+  .strengths li:hover {
+    background: color-mix(in srgb, var(--paper) 96%, var(--ink));
+  }
+
+  .strengths h3 {
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.015em;
+    color: #222;
+  }
+
+  .strengths p {
+    font-weight: 400;
+    font-size: 16px;
+    color: #222;
+    max-width: 46rem;
+  }
+
+  /* ---------- Experience ---------- */
+  .experience > ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .experience > ol > li {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: 0.5rem 2rem;
+    align-items: baseline;
+    padding-block: 1.4rem;
+    border-bottom: 1px solid var(--line);
+    transition: background 0.2s ease;
+  }
+
+  .experience > ol > li:hover {
+    background: color-mix(in srgb, var(--paper) 96%, var(--ink));
+  }
+
+  .experience h3 {
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.015em;
+    color: #222;
+  }
+
+  .experience .company {
+    margin-top: 0.2rem;
+    font-size: 0.95rem;
+    color: var(--muted);
+  }
+
+  .experience .period {
+    margin-top: 0.5rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Пункты описания — буллетами, как в резюме. Маркер — тире. */
+  .experience .points {
+    margin: 0;
+    padding-left: 0;
+    max-width: 46rem;
+    list-style: none;
+  }
+
+  .experience .points li {
+    position: relative;
+    padding-left: 1.4rem;
+    font-weight: 400;
+    font-size: 16px;
+    color: #222;
+  }
+
+  /* Тире вынесено в поле, текст пункта выравнивается по одной линии */
+  .experience .points li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--muted);
+  }
+
+  .experience .points li + li {
+    margin-top: 0.4rem;
+  }
+
+  /* ---------- About ---------- */
+  /* Первый абзац — editorial-лид, крупнее и чернилами */
+  .bio :global(p:first-of-type) {
+    font-size: clamp(1.2rem, 2.4vw, 1.5rem);
+    line-height: 1.4;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    max-width: 32ch;
+  }
+
+  .bio :global(p + p) {
+    margin-top: 1.1rem;
+    max-width: 58ch;
+    font-size: 1rem;
+    color: var(--muted);
+  }
+
+  .facts {
+    margin-top: 2.25rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem 1.5rem;
+  }
+
+  .fact dd {
+    margin: 0.25rem 0 0;
+    font-size: 0.95rem;
+  }
+
+  /* ---------- Адаптив ---------- */
+  @media (max-width: 56rem) {
+    .strengths li,
+    .experience > ol > li {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 44rem) {
+    .grid {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+
+    .facts {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

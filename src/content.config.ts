@@ -13,4 +13,73 @@ const legal = defineCollection({
   }),
 });
 
-export const collections = { legal };
+const projects = defineCollection({
+  loader: glob({ pattern: '**/[^_]*.md', base: './src/content/projects' }),
+  schema: ({ image }) =>
+    z.object({
+      // Полный заголовок кейса: «Animi — animated stories & video reels templates»
+      title: z.string(),
+      // Короткое имя для карточки
+      name: z.string(),
+      // = URL кейса. На старые кейсы есть внешние ссылки — не менять.
+      slug: z.string(),
+      order: z.number(),
+      // Одна строка под именем на карточке
+      tagline: z.string(),
+      roles: z.array(z.string()),
+      cover: image(),
+      coverAlt: z.string(),
+      // Локальное видео-превью появится, когда файлы будут в works/
+      coverVideo: z.string().optional(),
+      // Два-три предложения для колонки описания в блоке кейса
+      summary: z.string().optional(),
+      // Поля карточки: слева подпись, справа значение
+      years: z.string().optional(),
+      role: z.string().optional(),
+      links: z
+        .array(z.object({ label: z.string(), url: z.string() }))
+        .optional(),
+      // Лента скринов проекта: ширина ячейки берётся из пропорций первого файла
+      screens: z
+        .array(z.object({ src: image(), alt: z.string() }))
+        .optional(),
+      draft: z.boolean().default(false),
+    }),
+});
+
+// Один файл со всем контентом главной: тексты правятся там, не в коде.
+const home = defineCollection({
+  loader: glob({ pattern: 'home.md', base: './src/content/home' }),
+  schema: z.object({
+    status: z.string(),
+    headline: z.string(),
+    intro: z.string(),
+    companies: z.array(z.string()),
+    cta: z.string(),
+    // Мono-«спецификация» в hero: Status / Base / Experience
+    spec: z.array(z.object({ label: z.string(), value: z.string() })),
+    // Бегущая строка навыков между hero и работами
+    ticker: z.array(z.string()),
+    strengths: z.array(z.object({ title: z.string(), description: z.string() })),
+    facts: z.array(z.object({ label: z.string(), value: z.string() })),
+    // Опыт: слева роль/компания/период, справа описание — тексты из резюме.
+    experience: z.array(
+      z.object({
+        period: z.string(),
+        role: z.string(),
+        // У независимой практики компании нет
+        company: z.string().optional(),
+        // Пункты, как в резюме — каждый отдельным буллетом
+        description: z.array(z.string()),
+      }),
+    ),
+    links: z.object({
+      email: z.string(),
+      telegram: z.url(),
+      linkedin: z.url(),
+      resume: z.url(),
+    }),
+  }),
+});
+
+export const collections = { legal, projects, home };

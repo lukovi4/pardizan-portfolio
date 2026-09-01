@@ -30,8 +30,47 @@ const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site) : undefin
     <Font cssVariable="--font-sans" preload />
     <Font cssVariable="--font-mono" />
     <ClientRouter />
+    <script is:inline>
+      // До первой отрисовки: включает reveal-стили только при работающем JS.
+      document.documentElement.classList.add('js');
+    </script>
   </head>
   <body>
     <slot />
+    <script>
+      // Плавное появление [data-reveal]-блоков при входе во вьюпорт.
+      // Важно: наблюдатель с root по умолчанию не видит элементы внутри
+      // вложенных скролл-контейнеров, поэтому такие блоки помечать не нужно.
+      const reveal = () => {
+        const els = document.querySelectorAll('[data-reveal]:not(.revealed)');
+        if (!els.length) return;
+        // root — сам скроллер: наблюдатель с root по умолчанию не видит
+        // элементы внутри вложенного контейнера прокрутки.
+        const scroller = document.querySelector('.scroller');
+        const io = new IntersectionObserver(
+          (entries, obs) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('revealed');
+                obs.unobserve(entry.target);
+              }
+            }
+          },
+          { root: scroller instanceof HTMLElement && scroller.scrollHeight > scroller.clientHeight ? scroller : null, rootMargin: '0px 0px -8% 0px' },
+        );
+        els.forEach((el) => io.observe(el));
+
+        // Страховка: контент не должен пропасть, если наблюдатель не отработал
+        // (фоновая вкладка, скрытый предок, прыжок по якорю).
+        setTimeout(() => {
+          for (const el of els) {
+            const box = el.getBoundingClientRect();
+            if (box.top < innerHeight && box.bottom > 0) el.classList.add('revealed');
+          }
+        }, 1200);
+      };
+      reveal();
+      document.addEventListener('astro:page-load', reveal);
+    </script>
   </body>
 </html>

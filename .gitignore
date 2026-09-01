@@ -24,3 +24,7 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# личные файлы резюме — в публичный репозиторий не кладём
+*.docx
+*.pdf

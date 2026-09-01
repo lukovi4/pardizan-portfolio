@@ -1,14 +1,21 @@
-/* Дизайн-токены. Наращиваются по мере вёрстки, ничего впрок. */
+/* Дизайн-токены. Утверждено: жёлтый — основной (поверхности), красный — акцент. */
 :root {
-  --paper: #fafaf9;
-  --ink: #16150f;
-  --muted: #6f6e66;
-  --line: #e5e3dc;
+  --paper: #fff;
+  --surface: #f6f5f2; /* подложка карточек на белом фоне */
+  --ink: #171610;
+  --muted: #6f6d64;
+  --line: #e6e4da;
+
+  --brand: #ffde54; /* жёлтый: сигнальная полоса, кнопки */
+  --accent: #e03a1a; /* красный: стрелки, движение метрик */
+  --accent-ink: #b52d10; /* красный для текста ссылок (контраст AA) */
+  --ok: #2e9e4f; /* семантический: статус open to work */
 
   /* --font-sans (Geist) и --font-mono (Geist Mono) объявляет <Font> в Base.astro. */
 
   --gutter: clamp(1.25rem, 5vw, 3rem);
-  --page-max: 75rem;
+  --page-max: 72rem;
+  --header-h: 3.75rem;
 }
 
 /* Сброс */
@@ -22,6 +29,7 @@
 html {
   color-scheme: light;
   -webkit-text-size-adjust: none;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -32,6 +40,8 @@ body {
   font-size: 1rem;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  /* Жёлтая сигнальная полоса — часть айдентики */
+  border-top: 4px solid var(--brand);
 }
 
 img,
@@ -46,8 +56,148 @@ a {
   color: inherit;
 }
 
+::selection {
+  background: var(--brand);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* Страница листается постранично: единственный скроллер — .scroller,
+   каждая его секция примагничивается. Такой изолированный контейнер —
+   единственный безопасный способ применить mandatory: на документе он делает
+   недостижимым контент, у которого нет точек привязки. */
+.scroller {
+  height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* Плавность нужна именно контейнеру: страница больше не скроллится,
+     поэтому smooth на <html> к переходам по меню не применяется. */
+  scroll-behavior: smooth;
+}
+
+/* Скроллится только .scroller. Страница фиксируется по высоте окна, иначе
+   4px фирменной полосы делают документ выше экрана и он тоже начинает ехать. */
+@media (min-width: 56rem) {
+  body {
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .scroller {
+    height: 100%;
+  }
+}
+
+@media (min-width: 56rem) and (prefers-reduced-motion: no-preference) {
+  .scroller {
+    scroll-snap-type: y mandatory;
+  }
+}
+
+/* На мобильных — обычная прокрутка страницы, без экранов */
+@media (max-width: 56rem) {
+  .scroller {
+    height: auto;
+    overflow: visible;
+  }
+}
+
+/* Каждая секция — отдельный экран. Условие корректной работы mandatory:
+   секция не выше экрана, иначе её низ станет недостижимым. */
+/* Экран: если содержимое помещается — центрируем его и примагничиваем секцию;
+   если не помещается — секция растёт и прокручивается как обычно, а привязка
+   срабатывает на её границе. Никаких вложенных скроллеров. */
+.screen {
+  min-height: 100dvh;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  justify-content: safe center;
+  padding-block: calc(var(--header-h) + 1.5rem) 2.5rem;
+}
+
+/* Экран равен контейнеру, а не 100dvh: фирменная полоса 4px уменьшает
+   контейнер, и секции во весь экран оставляли хвост на каждом шаге. */
+@media (min-width: 56rem) {
+  .screen {
+    min-height: 100%;
+  }
+}
+
+@media (max-width: 56rem) {
+  .screen {
+    min-height: 0;
+    padding-block: calc(var(--header-h) + 1.5rem) 3rem;
+  }
+}
+
+/* Общие утилиты — ровно три, больше не заводим без нужды. */
+.shell {
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.cap {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--brand);
+  color: var(--ink);
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 0.7rem 1.15rem;
+  border-radius: 6px;
+  text-decoration: none;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(23, 22, 16, 0.12);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Появление секций по скроллу. Работает только при включённом JS:
+   без него контент виден сразу. */
+html.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
+}
+
+html.js [data-reveal].revealed {
+  opacity: 1;
+  transform: none;
+}
+
 /* Уважение к настройкам системы: без анимаций для тех, кто их отключил. */
 @media (prefers-reduced-motion: reduce) {
+  html,
+  .scroller {
+    scroll-behavior: auto;
+  }
+
   *,
   *::before,
   *::after {

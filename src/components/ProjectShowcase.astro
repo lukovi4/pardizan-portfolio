@@ -1,0 +1,203 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import CaseInfo from './CaseInfo.astro';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  /** Якорь для меню — ставится только первому кейсу */
+  anchor?: string;
+}
+
+const { project, anchor } = Astro.props;
+const { screens = [] } = project.data;
+
+// Ширина ячейки — из пропорций первого скрина: мобильные встают узкими
+// колонками, десктопные — широкими. Запасное значение — пропорции iPhone.
+const first = screens[0]?.src;
+const ratio = first ? first.width / first.height : 780 / 1688;
+---
+
+<section id={anchor} class="case screen" style={`--cell-ratio: ${ratio}`}>
+  <!-- Лента листается трекпадом, свайпом и перетаскиванием мыши.
+       Описание лежит отдельным слоем — оно не участвует в прокрутке. -->
+  <div class="case-body">
+    <div class="pin">
+      <CaseInfo project={project} />
+    </div>
+    <div class="strip" data-strip>
+      <ul>
+        {
+          screens.map((screen) => (
+            <li>
+              <Image
+                src={screen.src}
+                alt={screen.alt}
+                widths={[300, 600, 1200]}
+                sizes="(max-width: 56rem) 60vw, 40vw"
+                loading="lazy"
+              />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .case {
+    display: grid;
+    /* minmax(0, 1fr) обязателен: иначе grid-элемент не сжимается уже своего
+       содержимого, лента растягивается во всю длину и толкает страницу вбок. */
+    grid-template-columns: minmax(0, 1fr);
+    align-content: center;
+    /* Без ограничения по ширине: кейс занимает экран, только 40px по краям */
+    padding-inline: 40px;
+
+    /* Высота ячеек резиновая: занимает весь экран за вычетом шапки и полей
+       секции, поэтому на высоком мониторе скрины крупнее. Верхняя граница
+       нужна, чтобы на очень высоких экранах кейс не разъезжался. */
+    --chrome-h: calc(var(--header-h) + 1.5rem + 2.5rem);
+    --cell-h: clamp(320px, calc(100dvh - var(--chrome-h)), 900px);
+    /* Ширины считаются из высоты — пропорции скрина и карточки описания */
+    --cell-w: calc(var(--cell-h) * var(--cell-ratio));
+    --info-w: calc(var(--cell-h) * 780 / 1688 * 1.5);
+  }
+
+  /* ---------- Лента мобильных скринов ---------- */
+  .case-body {
+    position: relative;
+    /* Запрет на раздувание: иначе лента растягивается во всю длину */
+    min-width: 0;
+  }
+
+  /* Описание вынуто из потока прокрутки: не sticky, а неподвижный слой,
+     поэтому при перетаскивании ленты оно не дрожит. */
+  .pin {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+  }
+
+  .strip {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    /* Диагональный свайп не должен уводить вертикальную прокрутку страницы */
+    touch-action: pan-y;
+    /* Лента выходит за правый отступ секции — скрины срезает край экрана. */
+    margin-right: -40px;
+    cursor: grab;
+    /* Полосу прокрутки прячем — лента листается жестом, а не скроллбаром */
+    scrollbar-width: none;
+  }
+
+  .strip::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Во время перетаскивания курсор держит «схваченное» состояние,
+     а текст и картинки не выделяются. */
+  .strip.dragging {
+    cursor: grabbing;
+    user-select: none;
+  }
+
+  .strip ul {
+    display: flex;
+    width: max-content;
+    gap: 24px;
+    margin: 0;
+    /* Слева — место под неподвижное описание, справа — хвост, чтобы в конце
+       прокрутки последний скрин отступал от края так же, как описание. */
+    /* Слева — место под неподвижное описание, справа — хвост ряда */
+    padding: 0 40px 0 calc(var(--info-w) + 24px);
+    list-style: none;
+  }
+
+  .strip li {
+    flex: none;
+  }
+
+
+  .strip :global(img) {
+    width: var(--cell-w);
+    height: var(--cell-h);
+    border-radius: 14px;
+    /* Пропорции скрина совпадают с ячейкой — обрезки не будет */
+    object-fit: cover;
+    background: #fff;
+    /* Иначе браузер начинает своё перетаскивание картинки */
+    -webkit-user-drag: none;
+    user-select: none;
+  }
+
+  @media (max-width: 56rem) {
+    .strip ul {
+      gap: 16px;
+    }
+  }
+</style>
+
+<script>
+  const setupStrips = () => {
+    document.querySelectorAll<HTMLElement>('[data-strip]').forEach((strip) => {
+      if (strip.dataset.dragReady) return;
+      strip.dataset.dragReady = '1';
+
+      let pointerId: number | null = null;
+      let startX = 0;
+      let startLeft = 0;
+      let moved = false;
+
+      strip.addEventListener('pointerdown', (event) => {
+        // Тач и перо листают лентой сами — перехватываем только мышь.
+        if (event.pointerType !== 'mouse') return;
+        pointerId = event.pointerId;
+        startX = event.clientX;
+        startLeft = strip.scrollLeft;
+        moved = false;
+      });
+
+      strip.addEventListener('pointermove', (event) => {
+        if (pointerId === null || event.pointerId !== pointerId) return;
+        const shift = event.clientX - startX;
+        // Захват начинается только после заметного движения, иначе обычный
+        // клик по кнопке внутри ленты не доходил бы до ссылки.
+        if (!moved && Math.abs(shift) < 4) return;
+        if (!moved) {
+          moved = true;
+          strip.classList.add('dragging');
+          strip.setPointerCapture(event.pointerId);
+        }
+        strip.scrollLeft = startLeft - shift;
+      });
+
+      const stop = (event: PointerEvent) => {
+        if (pointerId === null || event.pointerId !== pointerId) return;
+        if (strip.hasPointerCapture(event.pointerId)) strip.releasePointerCapture(event.pointerId);
+        strip.classList.remove('dragging');
+        pointerId = null;
+      };
+
+      strip.addEventListener('pointerup', stop);
+      strip.addEventListener('pointercancel', stop);
+
+      // Перетаскивание не должно срабатывать как клик по ссылке.
+      strip.addEventListener(
+        'click',
+        (event) => {
+          if (!moved) return;
+          event.preventDefault();
+          event.stopPropagation();
+          moved = false;
+        },
+        true,
+      );
+    });
+  };
+
+  setupStrips();
+  document.addEventListener('astro:page-load', setupStrips);
+</script>

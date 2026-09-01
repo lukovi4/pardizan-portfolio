@@ -1,0 +1,115 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  index: number;
+}
+
+const { project, index } = Astro.props;
+const { name, slug, tagline, roles, cover, coverAlt } = project.data;
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const number = String(index + 1).padStart(2, '0');
+---
+
+<a class="card" href={`${base}/${slug}`} data-reveal>
+  <div class="cover" transition:name={`cover-${slug}`}>
+    <span class="tag">{number}</span>
+    <Image
+      src={cover}
+      alt={coverAlt}
+      widths={[480, 720, 1080]}
+      sizes="(max-width: 44rem) 92vw, 55vw"
+      loading={index < 2 ? 'eager' : 'lazy'}
+    />
+  </div>
+  <div class="meta">
+    <span class="name">{name}</span>
+    <span class="arr" aria-hidden="true">→</span>
+  </div>
+  <p class="tagline">{tagline}</p>
+  <p class="roles">{roles.join(' · ')}</p>
+</a>
+
+<style>
+  .card {
+    display: block;
+    text-decoration: none;
+  }
+
+  .cover {
+    position: relative;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    aspect-ratio: 1;
+    background: #fff;
+  }
+
+  /* Жёлтый номер-ярлык — фирменная деталь */
+  .tag {
+    position: absolute;
+    z-index: 1;
+    top: 0.9rem;
+    left: 0.9rem;
+    background: var(--brand);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    padding: 0.25rem 0.55rem;
+    border-radius: 4px;
+  }
+
+  .cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .card:hover .cover img {
+    transform: scale(1.025);
+  }
+
+  .meta {
+    margin-top: 1.1rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+  }
+
+  .name {
+    font-weight: 600;
+    font-size: 1.35rem;
+    letter-spacing: -0.015em;
+  }
+
+  .arr {
+    margin-left: auto;
+    color: var(--accent);
+    transition: transform 0.2s ease;
+  }
+
+  .card:hover .arr {
+    transform: translateX(4px);
+  }
+
+  .tagline {
+    margin-top: 0.3rem;
+    color: var(--muted);
+    font-size: 0.95rem;
+    max-width: 36rem;
+  }
+
+  .roles {
+    margin-top: 0.55rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+</style>
