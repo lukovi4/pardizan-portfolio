@@ -43,6 +43,22 @@ const projects = defineCollection({
       screens: z
         .array(z.object({ src: image(), alt: z.string() }))
         .optional(),
+      // Абзац-вступление на странице кейса. Если пусто — берётся summary.
+      lead: z.string().optional(),
+      // Разделы страницы кейса: заголовок слева, абзацы справа, под ними лента
+      sections: z
+        .array(
+          z.object({
+            title: z.string(),
+            body: z.array(z.string()),
+            // Сноска мелким шрифтом под абзацами
+            note: z.string().optional(),
+            screens: z
+              .array(z.object({ src: image(), alt: z.string() }))
+              .optional(),
+          }),
+        )
+        .optional(),
       draft: z.boolean().default(false),
     }),
 });

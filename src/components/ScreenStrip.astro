@@ -1,0 +1,168 @@
+---
+import { Image } from 'astro:assets';
+
+interface Props {
+  screens: { src: ImageMetadata; alt: string }[];
+  /** Резервирует слева место под неподвижную карточку описания (главная) */
+  lead?: boolean;
+}
+
+const { screens, lead = false } = Astro.props;
+
+// Ширина ячейки — из пропорций первого скрина: мобильные встают узкими
+// колонками, десктопные — широкими. Запасное значение — пропорции iPhone.
+const first = screens[0];
+const ratio = first ? first.src.width / first.src.height : 780 / 1688;
+---
+
+{/*
+  Единственное место, где живёт поведение ленты: прокрутка трекпадом, свайп и
+  перетаскивание мышью. Родитель управляет ей через переменные:
+    --cell-h      высота ячейки (обязательна)
+    --strip-tail  хвост справа в конце прокрутки (по умолчанию 40px)
+    --strip-bleed отрицательный отступ справа, чтобы лента уходила за край
+    --info-w      ширина карточки описания — нужна только при lead
+*/}
+<div class:list={['strip', lead && 'has-lead']} style={`--cell-ratio: ${ratio}`} data-strip>
+  <ul>
+    {
+      screens.map((screen) => (
+        <li>
+          <Image
+            src={screen.src}
+            alt={screen.alt}
+            widths={[300, 600, 1200]}
+            sizes="(max-width: 56rem) 60vw, 40vw"
+            loading="lazy"
+          />
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .strip {
+    --cell-w: calc(var(--cell-h) * var(--cell-ratio));
+
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    /* Диагональный свайп не должен уводить вертикальную прокрутку страницы */
+    touch-action: pan-y;
+    /* Лента может выходить за правый край секции — скрины срезает край экрана */
+    margin-right: var(--strip-bleed, 0px);
+    cursor: grab;
+    /* Полосу прокрутки прячем — лента листается жестом, а не скроллбаром */
+    scrollbar-width: none;
+  }
+
+  .strip::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Во время перетаскивания курсор держит «схваченное» состояние,
+     а текст и картинки не выделяются. */
+  .strip.dragging {
+    cursor: grabbing;
+    user-select: none;
+  }
+
+  .strip ul {
+    display: flex;
+    width: max-content;
+    gap: 24px;
+    margin: 0;
+    /* Справа — хвост, чтобы в конце прокрутки последний скрин отступал от края */
+    padding: 0 var(--strip-tail, 40px) 0 0;
+    list-style: none;
+  }
+
+  /* Слева — место под неподвижную карточку описания */
+  .strip.has-lead ul {
+    padding-left: calc(var(--info-w) + 24px);
+  }
+
+  .strip li {
+    flex: none;
+  }
+
+  .strip img {
+    width: var(--cell-w);
+    height: var(--cell-h);
+    border-radius: 14px;
+    /* Пропорции скрина совпадают с ячейкой — обрезки не будет */
+    object-fit: cover;
+    background: #fff;
+    /* Иначе браузер начинает своё перетаскивание картинки */
+    -webkit-user-drag: none;
+    user-select: none;
+  }
+
+  @media (max-width: 56rem) {
+    .strip ul {
+      gap: 16px;
+    }
+  }
+</style>
+
+<script>
+  const setupStrips = () => {
+    document.querySelectorAll<HTMLElement>('[data-strip]').forEach((strip) => {
+      if (strip.dataset.dragReady) return;
+      strip.dataset.dragReady = '1';
+
+      let pointerId: number | null = null;
+      let startX = 0;
+      let startLeft = 0;
+      let moved = false;
+
+      strip.addEventListener('pointerdown', (event) => {
+        // Тач и перо листают лентой сами — перехватываем только мышь.
+        if (event.pointerType !== 'mouse') return;
+        pointerId = event.pointerId;
+        startX = event.clientX;
+        startLeft = strip.scrollLeft;
+        moved = false;
+      });
+
+      strip.addEventListener('pointermove', (event) => {
+        if (pointerId === null || event.pointerId !== pointerId) return;
+        const shift = event.clientX - startX;
+        // Захват начинается только после заметного движения, иначе обычный
+        // клик по кнопке внутри ленты не доходил бы до ссылки.
+        if (!moved && Math.abs(shift) < 4) return;
+        if (!moved) {
+          moved = true;
+          strip.classList.add('dragging');
+          strip.setPointerCapture(event.pointerId);
+        }
+        strip.scrollLeft = startLeft - shift;
+      });
+
+      const stop = (event: PointerEvent) => {
+        if (pointerId === null || event.pointerId !== pointerId) return;
+        if (strip.hasPointerCapture(event.pointerId)) strip.releasePointerCapture(event.pointerId);
+        strip.classList.remove('dragging');
+        pointerId = null;
+      };
+
+      strip.addEventListener('pointerup', stop);
+      strip.addEventListener('pointercancel', stop);
+
+      // Перетаскивание не должно срабатывать как клик по ссылке.
+      strip.addEventListener(
+        'click',
+        (event) => {
+          if (!moved) return;
+          event.preventDefault();
+          event.stopPropagation();
+          moved = false;
+        },
+        true,
+      );
+    });
+  };
+
+  setupStrips();
+  document.addEventListener('astro:page-load', setupStrips);
+</script>

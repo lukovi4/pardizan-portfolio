@@ -1,23 +1,37 @@
 ---
 import { Image } from 'astro:assets';
-import { getCollection, getEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 
 export async function getStaticPaths() {
-  const projects = await getCollection('projects', ({ data }) => !data.draft);
-  return projects.map((project) => ({
+  const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(
+    (a, b) => a.data.order - b.data.order,
+  );
+
+  return projects.map((project, i) => ({
     params: { project: project.data.slug },
-    props: { project },
+    // Кольцевой переход: с последнего кейса возвращаемся к первому
+    props: { project, next: projects[(i + 1) % projects.length] },
   }));
 }
 
-const { project } = Astro.props;
-const { title, name, slug, tagline, roles, cover, coverAlt } = project.data;
+const { project, next } = Astro.props;
+const { title, name, tagline, roles, summary, lead, years, role, links, sections = [] } =
+  project.data;
 
-const home = await getEntry('home', 'home');
-if (!home) throw new Error('src/content/home/home.md не найден');
+// Поля кейса: подпись слева, значение справа — как в карточке на главной
+const fields = [
+  years && { label: 'Years', value: years },
+  role && { label: 'Role', value: role },
+  roles?.length && { label: 'Scope', value: roles.join(', ') },
+].filter(Boolean) as { label: string; value: string }[];
+
+// Раскладка ряда определяется ориентацией первого скрина: мобильные экраны
+// вертикальные — три в ряд, веб горизонтальный — один на всю ширину.
+const isWide = (screens?: { src: ImageMetadata }[]) =>
+  !!screens?.length && screens[0].src.width > screens[0].src.height;
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
@@ -25,78 +39,255 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 <Base title={`${name} — Evgeny Lukovich`} description={tagline}>
   <Header />
 
-  <main class="case shell">
-    <a class="back cap" href={`${base}/#work`}>← All work</a>
-    <p class="cap roles">{roles.join(' · ')}</p>
-    <h1>{title}</h1>
-    <div class="cover" transition:name={`cover-${slug}`}>
-      <Image src={cover} alt={coverAlt} widths={[720, 1080, 1600]} sizes="92vw" loading="eager" />
+  <main class="case-page">
+    <div class="shell head">
+      <h1>{title}</h1>
+      {(lead ?? summary) && <p class="lead">{lead ?? summary}</p>}
+
+      <dl class="fields">
+        {
+          fields.map((field) => (
+            <div class="field">
+              <dt>{field.label}</dt>
+              <dd>{field.value}</dd>
+            </div>
+          ))
+        }
+        {
+          links && links.length > 0 && (
+            <div class="field">
+              <dt>Media</dt>
+              <dd class="links">
+                {links.map((link) => (
+                  <a href={link.url} target="_blank" rel="noopener">
+                    {link.label} <span aria-hidden="true">↗</span>
+                  </a>
+                ))}
+              </dd>
+            </div>
+          )
+        }
+      </dl>
     </div>
-    <div class="soon" data-reveal>
-      <p class="cap">Case study</p>
-      <p class="note">
-        The full case study is being rebuilt for the new site. Meanwhile — <a
-          href={`mailto:${home.data.links.email}`}>drop me a line</a
-        > and I'll walk you through the project.
-      </p>
-    </div>
+
+    {
+      sections.map((section) => (
+        <section class="chapter">
+          <div class="shell chapter-head">
+            <h2>{section.title}</h2>
+            <div class="chapter-body">
+              {section.body.map((paragraph) => (
+                <p>{paragraph}</p>
+              ))}
+              {section.note && <p class="note">{section.note}</p>}
+            </div>
+          </div>
+
+          {section.screens && section.screens.length > 0 && (
+            <ul class:list={['shots', 'shell', isWide(section.screens) && 'wide']}>
+              {section.screens.map((screen) => (
+                <li>
+                  <Image
+                    src={screen.src}
+                    alt={screen.alt}
+                    widths={[300, 600, 1200]}
+                    sizes="(max-width: 36rem) 92vw, (max-width: 56rem) 46vw, (max-width: 64rem) 30vw, 22vw"
+                    loading="lazy"
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      ))
+    }
+
+    <nav class="shell next" aria-label="Next case">
+      <span class="cap">Next case</span>
+      <a href={`${base}/${next.data.slug}`}>
+        {next.data.name} <span aria-hidden="true">→</span>
+      </a>
+    </nav>
   </main>
 
   <Footer />
 </Base>
 
 <style>
-  .case {
-    padding-block: clamp(2.5rem, 6vw, 4rem) clamp(3.5rem, 9vw, 6rem);
+  .case-page {
+    padding-bottom: clamp(3.5rem, 9vw, 6rem);
   }
 
-  .back {
-    display: inline-block;
-    text-decoration: none;
-  }
-
-  .back:hover {
-    color: var(--ink);
-  }
-
-  .roles {
-    margin-top: clamp(2rem, 5vw, 3rem);
+  /* ---------- Шапка кейса ---------- */
+  .head {
+    padding-top: calc(var(--header-h) + clamp(2.5rem, 7vw, 5rem));
   }
 
   h1 {
-    margin-top: 0.8rem;
     font-weight: 600;
     font-size: clamp(2rem, 5.5vw, 3.75rem);
     line-height: 1.05;
     letter-spacing: -0.03em;
     text-wrap: balance;
-    max-width: 24ch;
+    max-width: 20ch;
   }
 
-  .cover {
-    margin-top: clamp(2rem, 5vw, 3rem);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    overflow: hidden;
-    background: #f2f0e9;
-  }
-
-  .soon {
-    margin-top: clamp(2rem, 5vw, 3rem);
-    border-top: 1px solid var(--line);
-    padding-top: 1.25rem;
-  }
-
-  .note {
-    margin-top: 0.5rem;
-    max-width: 48ch;
+  .lead {
+    margin-top: 1.25rem;
+    max-width: 46rem;
+    font-size: clamp(1.05rem, 2vw, 1.25rem);
+    line-height: 1.5;
     color: var(--muted);
   }
 
-  .note a {
+  /* Поля кейса: слева подпись, справа значение, строки разделены линиями */
+  .fields {
+    margin: clamp(2rem, 5vw, 3rem) 0 0;
+    max-width: 34rem;
+  }
+
+  .field {
+    display: grid;
+    grid-template-columns: minmax(0, 6rem) minmax(0, 1fr);
+    gap: 1rem;
+    align-items: baseline;
+    padding-block: 0.7rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .field:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  dt {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #222;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+  }
+
+  .links a {
+    text-decoration: none;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .links a:hover {
+    border-color: var(--accent-ink);
     color: var(--accent-ink);
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 3px;
+  }
+
+  /* ---------- Разделы кейса ---------- */
+  .chapter {
+    margin-top: clamp(3rem, 7vw, 5rem);
+  }
+
+  /* Та же сетка, что у Core strengths и Experience: заголовок слева, текст справа */
+  .chapter-head {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: 0.5rem 2rem;
+    align-items: start;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .chapter h2 {
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.015em;
+    color: #222;
+  }
+
+  .chapter-body p {
+    font-weight: 400;
+    font-size: 16px;
+    color: #222;
+    max-width: 46rem;
+  }
+
+  .chapter-body p + p {
+    margin-top: 0.9rem;
+  }
+
+  .note {
+    margin-top: 1.25rem;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  /* ---------- Скрины: ряды по четыре, у веба — один на ряд ---------- */
+  .shots {
+    margin-top: clamp(1.75rem, 4vw, 2.5rem);
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 24px;
+    list-style: none;
+  }
+
+  .shots.wide {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .shots :global(img) {
+    width: 100%;
+    height: auto;
+    border-radius: 14px;
+    background: var(--surface);
+  }
+
+  @media (max-width: 64rem) {
+    .shots {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 56rem) {
+    .chapter-head {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    .shots {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+  }
+
+  @media (max-width: 36rem) {
+    .shots {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* ---------- Следующий кейс ---------- */
+  .next {
+    margin-top: clamp(3.5rem, 8vw, 5.5rem);
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .next a {
+    font-weight: 600;
+    font-size: clamp(1.75rem, 4.5vw, 2.75rem);
+    letter-spacing: -0.025em;
+    text-decoration: none;
+    width: fit-content;
+  }
+
+  .next a:hover {
+    color: var(--accent-ink);
   }
 </style>
