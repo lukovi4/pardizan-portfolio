@@ -9,11 +9,12 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 <header class="site-header">
   <div class="shell inner">
-    <a class="wordmark" href={`${base}/`}>Evgeny Lukovich</a>
+    <a class="wordmark" href={`${base}/#hero`}>Evgeny Lukovich</a>
     <nav aria-label="Main">
       <a href={`${base}/#cases`}>Work</a>
       <a href={`${base}/#experience`}>Experience</a>
       <a href={`${base}/#about`}>About</a>
+      <a href={`${base}/#contact`}>Contact</a>
       <a href={home.data.links.resume} target="_blank" rel="noopener">CV</a>
     </nav>
   </div>
@@ -68,3 +69,33 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     text-underline-offset: 6px;
   }
 </style>
+
+<script>
+  // Якорь на текущую страницу браузер отрабатывает только когда адрес меняется:
+  // повторный клик по тому же пункту (или по знаку сайта, когда в адресе уже
+  // #hero) не делал ничего. Прокручиваем сами, адрес правим вручную.
+  const scrollToHash = (event: MouseEvent) => {
+    // Клик с модификатором — открыть в новой вкладке, не мешаем
+    if (event.defaultPrevented || event.button !== 0) return;
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+    const link = (event.target as Element | null)?.closest?.('a[href]');
+    if (!(link instanceof HTMLAnchorElement) || link.target === '_blank') return;
+
+    const url = new URL(link.href);
+    // Только ссылки на текущую страницу: переходы на другие обрабатывает Astro
+    if (url.origin !== location.origin || url.pathname !== location.pathname) return;
+    if (!url.hash || url.hash === '#') return;
+
+    const target = document.querySelector(url.hash);
+    if (!target) return;
+
+    event.preventDefault();
+    // Без behavior — уважаем scroll-behavior контейнера и «уменьшить движение»
+    target.scrollIntoView({ block: 'start' });
+    history.pushState(null, '', url.hash);
+  };
+
+  // Перехват на этапе погружения: иначе клик успеет забрать роутер Astro
+  document.addEventListener('click', scrollToHash, true);
+</script>
