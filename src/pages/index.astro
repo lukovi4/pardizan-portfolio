@@ -139,9 +139,189 @@ const cases = projects.filter((project) => project.data.screens?.length);
     </section>
     <Footer />
   </main>
+
+  {/*
+    Галерея. <dialog> с showModal() рисуется в верхнем слое браузера — выше
+    рамки окна и любых z-index, поэтому обычная накладка тут не подошла бы.
+    Затемнение, ловушка фокуса и закрытие по Esc — штатные.
+  */}
+  <dialog class="lightbox" data-lightbox aria-label="Project screenshots">
+    <div class="lightbox-body">
+      <img data-lightbox-image alt="" sizes="92vw" />
+
+      <button class="lb-nav lb-prev" data-lightbox-prev aria-label="Previous screenshot">
+        <span aria-hidden="true">←</span>
+      </button>
+      <button class="lb-nav lb-next" data-lightbox-next aria-label="Next screenshot">
+        <span aria-hidden="true">→</span>
+      </button>
+      <button class="lb-close" data-lightbox-close aria-label="Close gallery">
+        <span aria-hidden="true">✕</span>
+      </button>
+
+      <p class="lb-counter cap" data-lightbox-counter></p>
+    </div>
+  </dialog>
 </Base>
 
 <style>
+  /* ---------- Галерея ---------- */
+  .lightbox {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    /* Прокрутка колесом над галереей не уводит страницу под ней */
+    overscroll-behavior: contain;
+
+    /* Закрытое состояние, оно же конечное при уходе. display и overlay
+       обязаны быть в списке: без них элемент вылетает из верхнего слоя
+       мгновенно и анимация закрытия обрывается. allow-discrete ставится
+       после списка, иначе сокращённая запись его затрёт. */
+    opacity: 0;
+    transform: scale(0.96);
+    transition-property: opacity, transform, display, overlay;
+    transition-duration: 0.25s;
+    transition-timing-function: ease-out;
+    transition-behavior: allow-discrete;
+  }
+
+  .lightbox[open] {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* Состояние, с которого начинается появление: без него переходу не от
+     чего отталкиваться и открытие остаётся резким. */
+  @starting-style {
+    .lightbox[open] {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+  }
+
+  .lightbox::backdrop {
+    background-color: rgb(12 11 8 / 0);
+    backdrop-filter: blur(0);
+    -webkit-backdrop-filter: blur(0);
+    transition-property: background-color, backdrop-filter, display, overlay;
+    transition-duration: 0.25s;
+    transition-timing-function: ease-out;
+    transition-behavior: allow-discrete;
+  }
+
+  .lightbox[open]::backdrop {
+    background-color: rgb(12 11 8 / 0.88);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  @starting-style {
+    .lightbox[open]::backdrop {
+      background-color: rgb(12 11 8 / 0);
+      backdrop-filter: blur(0);
+      -webkit-backdrop-filter: blur(0);
+    }
+  }
+
+  /* Уважение к системной настройке: появление без движения и почти мгновенно */
+  @media (prefers-reduced-motion: reduce) {
+    .lightbox,
+    .lightbox::backdrop {
+      transform: none;
+      transition-duration: 0.01ms;
+    }
+  }
+
+  .lightbox-body {
+    position: relative;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    padding: clamp(1rem, 4vw, 3rem);
+  }
+
+  .lightbox img {
+    max-width: 92vw;
+    max-height: 86dvh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 14px;
+    background: var(--surface);
+  }
+
+  .lb-nav,
+  .lb-close {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.12);
+    color: #fff;
+    cursor: pointer;
+    transition:
+      background 0.15s ease,
+      transform 0.15s ease;
+  }
+
+  .lb-nav:hover,
+  .lb-close:hover {
+    background: rgb(255 255 255 / 0.24);
+  }
+
+  .lb-nav:active {
+    transform: translateY(-50%) scale(0.94);
+  }
+
+  .lb-nav {
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3.25rem;
+    height: 3.25rem;
+    font-size: 1.35rem;
+  }
+
+  .lb-prev {
+    left: clamp(0.75rem, 2.5vw, 2rem);
+  }
+
+  .lb-next {
+    right: clamp(0.75rem, 2.5vw, 2rem);
+  }
+
+  /* Одна работа в списке — листать нечего */
+  .lightbox[data-single] .lb-nav,
+  .lightbox[data-single] .lb-counter {
+    display: none;
+  }
+
+  .lb-close {
+    top: clamp(0.75rem, 2.5vw, 2rem);
+    right: clamp(0.75rem, 2.5vw, 2rem);
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: 1rem;
+  }
+
+  .lb-close:active {
+    transform: scale(0.94);
+  }
+
+  .lb-counter {
+    position: absolute;
+    bottom: clamp(0.75rem, 2.5vw, 2rem);
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgb(255 255 255 / 0.7);
+    font-variant-numeric: tabular-nums;
+  }
+
   /* ---------- Подложка под работами ---------- */
   /* Окно страницы: весь контент живёт внутри него и обрезается его краями.
      Сверху вплотную к шапке, снизу такое же поле, по бокам --panel-inset. */
@@ -475,4 +655,86 @@ const cases = projects.filter((project) => project.data.screens?.length);
 
   setupBackdrop();
   document.addEventListener('astro:page-load', setupBackdrop);
+</script>
+
+<script>
+  // Галерея: клик по скрину открывает его почти во весь экран. Список —
+  // те же скрины этой работы, что и в ленте, поэтому адреса берём прямо
+  // с картинок: srcset у них уже с самым крупным вариантом.
+  const setupGallery = () => {
+    const dialog = document.querySelector<HTMLDialogElement>('[data-lightbox]');
+    if (!dialog || typeof dialog.showModal !== 'function') return;
+
+    const view = dialog.querySelector<HTMLImageElement>('[data-lightbox-image]');
+    const counter = dialog.querySelector<HTMLElement>('[data-lightbox-counter]');
+    if (!view || !counter) return;
+
+    let items: { src: string; srcset: string; alt: string }[] = [];
+    let index = 0;
+
+    const render = () => {
+      const item = items[index];
+      if (!item) return;
+      // srcset ставим первым: иначе браузер успевает скачать запасной src
+      if (item.srcset) view.srcset = item.srcset;
+      else view.removeAttribute('srcset');
+      view.src = item.src;
+      view.alt = item.alt;
+      counter.textContent = `${index + 1} / ${items.length}`;
+    };
+
+    const step = (delta: number) => {
+      if (items.length < 2) return;
+      index = (index + delta + items.length) % items.length;
+      render();
+    };
+
+    document.querySelectorAll<HTMLElement>('[data-strip]').forEach((strip) => {
+      if (strip.dataset.galleryReady) return;
+      strip.dataset.galleryReady = '1';
+
+      // Обработчик всплывающий: перетаскивание ленты гасит клик на этапе
+      // погружения, поэтому протащенный скрин галерею не откроет.
+      strip.addEventListener('click', (event) => {
+        const target = event.target as Element | null;
+        const img = target?.closest?.('img');
+        if (!(img instanceof HTMLImageElement)) return;
+
+        const all = [...strip.querySelectorAll('img')];
+        items = all.map((el) => ({
+          src: el.currentSrc || el.src,
+          srcset: el.getAttribute('srcset') || '',
+          alt: el.alt,
+        }));
+        index = Math.max(0, all.indexOf(img));
+        dialog.toggleAttribute('data-single', items.length < 2);
+        render();
+        dialog.showModal();
+      });
+    });
+
+    dialog.querySelector('[data-lightbox-prev]')?.addEventListener('click', () => step(-1));
+    dialog.querySelector('[data-lightbox-next]')?.addEventListener('click', () => step(1));
+    dialog.querySelector('[data-lightbox-close]')?.addEventListener('click', () => dialog.close());
+
+    // Клик мимо картинки закрывает: цель — сам dialog, а не его содержимое
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog || (event.target as Element)?.classList?.contains('lightbox-body')) {
+        dialog.close();
+      }
+    });
+
+    dialog.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        step(1);
+      } else if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        step(-1);
+      }
+    });
+  };
+
+  setupGallery();
+  document.addEventListener('astro:page-load', setupGallery);
 </script>

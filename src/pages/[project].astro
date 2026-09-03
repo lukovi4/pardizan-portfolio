@@ -90,8 +90,18 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
                   <Image
                     src={screen.src}
                     alt={screen.alt}
-                    widths={[300, 600, 1200]}
-                    sizes="(max-width: 36rem) 92vw, (max-width: 56rem) 46vw, (max-width: 64rem) 30vw, 22vw"
+                    {...(isWide(section.screens)
+                      ? {
+                          // Одна работа на ряд — во всю ширину колонки текста
+                          widths: [800, 1600, 2400],
+                          sizes: '(max-width: 56rem) 92vw, 1060px',
+                        }
+                      : {
+                          // Четыре в ряд — ячейка около четверти колонки
+                          widths: [300, 600, 900],
+                          sizes:
+                            '(max-width: 36rem) 92vw, (max-width: 56rem) 46vw, (max-width: 64rem) 340px, 260px',
+                        })}
                     loading="lazy"
                   />
                 </li>

@@ -13,6 +13,14 @@ const { screens, lead = false } = Astro.props;
 // колонками, десктопные — широкими. Запасное значение — пропорции iPhone.
 const first = screens[0];
 const ratio = first ? first.src.width / first.src.height : 780 / 1688;
+
+// Ширина ячейки считается от высоты экрана (максимум 900px, на мобильных 560),
+// а не от ширины окна — поэтому sizes задаём в пикселях, иначе браузер берёт
+// вариант «на глазок». Горизонтальным работам нужны варианты крупнее: они
+// занимают почти всю ширину подложки, а не узкую колонку телефона.
+const wide = ratio > 1;
+const widths = wide ? [800, 1600, 2400, 3200] : [300, 600, 900];
+const sizes = `(max-width: 56rem) ${Math.round(560 * ratio)}px, ${Math.round(900 * ratio)}px`;
 ---
 
 {/*
@@ -31,8 +39,8 @@ const ratio = first ? first.src.width / first.src.height : 780 / 1688;
           <Image
             src={screen.src}
             alt={screen.alt}
-            widths={[300, 600, 1200]}
-            sizes="(max-width: 56rem) 60vw, 40vw"
+            widths={widths}
+            sizes={sizes}
             loading="lazy"
           />
         </li>
@@ -100,6 +108,8 @@ const ratio = first ? first.src.width / first.src.height : 780 / 1688;
     /* Иначе браузер начинает своё перетаскивание картинки */
     -webkit-user-drag: none;
     user-select: none;
+    /* Скрин открывается в галерее */
+    cursor: zoom-in;
   }
 
   /* Мобильная версия делается отдельно — там зазор пока прежний */
