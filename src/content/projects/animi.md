@@ -11,6 +11,7 @@ roles:
   - Design system
 cover: ../../assets/covers/animi.png
 coverAlt: Animi app home screen with story templates on an iPhone
+backdrop: '#EDE6DA'
 years: 2020 — 2022
 role: Product Designer
 summary: >-

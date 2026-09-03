@@ -10,10 +10,10 @@ interface Props {
 }
 
 const { project, anchor } = Astro.props;
-const { screens = [] } = project.data;
+const { screens = [], backdrop } = project.data;
 ---
 
-<section id={anchor} class="case screen">
+<section id={anchor} class="case screen" data-backdrop={backdrop}>
   <!-- Лента листается трекпадом, свайпом и перетаскиванием мыши.
        Описание лежит отдельным слоем — оно не участвует в прокрутке. -->
   <div class="case-body">
@@ -31,18 +31,45 @@ const { screens = [] } = project.data;
        содержимого, лента растягивается во всю длину и толкает страницу вбок. */
     grid-template-columns: minmax(0, 1fr);
     align-content: center;
-    /* Без ограничения по ширине: кейс занимает экран, только 40px по краям */
-    padding-inline: 40px;
 
-    /* Высота ячеек резиновая: занимает весь экран за вычетом шапки и полей
-       секции, поэтому на высоком мониторе скрины крупнее. Верхняя граница
-       нужна, чтобы на очень высоких экранах кейс не разъезжался. */
-    --chrome-h: calc(var(--header-h) + 1.5rem + 2.5rem);
-    --cell-h: clamp(320px, calc(100dvh - var(--chrome-h)), 900px);
-    /* Ширина карточки описания — полторы ячейки мобильного скрина */
-    --info-w: calc(var(--cell-h) * 780 / 1688 * 1.5);
-    /* Лента выходит за правый отступ секции — скрины срезает край экрана */
-    --strip-bleed: -40px;
+    /* Работа целиком вписана в подложку. Поля секции = отступ подложки от
+       края экрана плюс её внутреннее поле; справа поля нет — лента доходит
+       ровно до края подложки и обрезается им. */
+    padding-block: var(--header-h);
+    padding-inline: calc(var(--panel-inset) + var(--panel-pad)) var(--panel-inset);
+
+    /* Высота ячейки = внутренняя высота подложки. Верхняя граница нужна,
+       чтобы на очень высоких экранах кейс не разъезжался. */
+    --cell-h: clamp(
+      280px,
+      calc(100dvh - 2 * var(--header-h) - 2 * var(--panel-pad)),
+      900px
+    );
+    /* Ширина карточки описания — полторы ячейки мобильного скрина, но
+       в заданных границах: на низком окне не сплющивается, на высоком
+       не разъезжается. Границы меняются здесь. */
+    --info-min: 320px;
+    --info-max: 480px;
+    --info-w: clamp(
+      var(--info-min),
+      calc(var(--cell-h) * 780 / 1688 * 1.5),
+      var(--info-max)
+    );
+    /* Лента упирается в правый край подложки, хвост в конце прокрутки —
+       её внутреннее поле */
+    --strip-bleed: 0px;
+    --strip-tail: var(--panel-pad);
+  }
+
+  /* Без постраничности подложки нет — работы живут по обычным полям страницы */
+  @media (max-width: 56rem) {
+    .case {
+      padding-block: 2rem;
+      padding-inline: var(--gutter);
+      --cell-h: clamp(280px, 62dvh, 560px);
+      --strip-bleed: calc(-1 * var(--gutter));
+      --strip-tail: var(--gutter);
+    }
   }
 
   .case-body {

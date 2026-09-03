@@ -11,6 +11,7 @@ roles:
   - Analytics
 cover: ../../assets/covers/lastik.png
 coverAlt: Lastik game category screen with illustrated covers on an iPhone
+backdrop: '#F2DFD0'
 years: '2026'
 role: Concept, design, analytics
 summary: >-

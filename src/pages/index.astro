@@ -44,8 +44,14 @@ const cases = projects.filter((project) => project.data.screens?.length);
 >
   <Header />
 
+  {/* Неподвижная подложка под работами: цвет берётся у активного кейса */}
+  <div class="backdrop" data-backdrop-layer aria-hidden="true"></div>
+  {/* Постоянная рамка страницы: белая заливка снаружи обрезает всё,
+      что выехало за её края при прокрутке */}
+  <div class="frame" aria-hidden="true"></div>
+
   <main class="scroller">
-    <section class="hero screen shell">
+    <section id="hero" class="hero screen shell">
       <h1>{headText}<span class="mark">{headMark}</span></h1>
       <p class="sub">
         {intro}{' '}
@@ -136,15 +142,64 @@ const cases = projects.filter((project) => project.data.screens?.length);
 </Base>
 
 <style>
+  /* ---------- Подложка под работами ---------- */
+  /* Окно страницы: весь контент живёт внутри него и обрезается его краями.
+     Сверху вплотную к шапке, снизу такое же поле, по бокам --panel-inset. */
+  .backdrop,
+  .frame {
+    position: fixed;
+    top: var(--header-h);
+    bottom: var(--header-h);
+    left: var(--panel-inset);
+    right: var(--panel-inset);
+    border-radius: var(--panel-radius);
+    pointer-events: none;
+  }
+
+  /* Цвет окна — под контентом. Появляется только под работой. */
+  .backdrop {
+    z-index: 0;
+    background: var(--backdrop-color, transparent);
+    opacity: 0;
+    transition:
+      background-color 0.5s ease,
+      opacity 0.45s ease;
+  }
+
+  .backdrop.is-on {
+    opacity: 1;
+  }
+
+  /* Рамка — поверх контента: заливка наружу закрывает всё, что выехало за
+     окно. Дырка в тени повторяет скругление, поэтому углы честные. */
+  .frame {
+    z-index: 5;
+    box-shadow: 0 0 0 100vmax var(--paper);
+  }
+
+  /* Контент между цветом и рамкой */
+  .scroller {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* На мобильных постраничности нет — страница листается обычным потоком,
+     неподвижное окно там только мешало бы. */
+  @media (max-width: 56rem) {
+    .backdrop,
+    .frame {
+      display: none;
+    }
+  }
+
   /* ---------- Hero ---------- */
   .hero {
     position: relative;
     padding-block: clamp(4rem, 11vw, 7.5rem) clamp(3rem, 8vw, 5.5rem);
   }
 
-  /* Крестики-миры, как в макетной сетке */
-  .hero::before,
-  .hero::after {
+  /* Крестик, как в макетной сетке */
+  .hero::before {
     content: '+';
     position: absolute;
     font-family: var(--font-mono);
@@ -153,14 +208,10 @@ const cases = projects.filter((project) => project.data.screens?.length);
     opacity: 0.55;
   }
 
+  /* Отсчёт от края окна, а не экрана — иначе рамка срезала бы крестики */
   .hero::before {
-    top: 1.4rem;
+    top: calc(var(--header-h) + 1rem);
     right: var(--gutter);
-  }
-
-  .hero::after {
-    bottom: 1.2rem;
-    left: var(--gutter);
   }
 
   h1 {
@@ -193,8 +244,6 @@ const cases = projects.filter((project) => project.data.screens?.length);
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    border-top: 1px solid var(--line);
-    padding-top: 1rem;
     margin-bottom: clamp(2rem, 5vw, 3rem);
   }
 
@@ -204,11 +253,12 @@ const cases = projects.filter((project) => project.data.screens?.length);
     letter-spacing: -0.02em;
   }
 
+  /* Поля равны краю окна плюс воздух — иначе рамка срезала бы низ текста */
   .work,
   .strengths,
   .experience,
   .about {
-    padding-block: calc(var(--header-h) + 1.5rem) 2.5rem;
+    padding-block: calc(var(--header-h) + 1rem);
   }
 
   /* Опыт длиннее экрана — и это нормально: спецификация требует игнорировать
@@ -237,6 +287,11 @@ const cases = projects.filter((project) => project.data.screens?.length);
     padding-block: 1.4rem;
     border-bottom: 1px solid var(--line);
     transition: background 0.2s ease;
+  }
+
+  /* Список не закрывается линией снизу — остаются только разделители */
+  .strengths li:last-child {
+    border-bottom: 0;
   }
 
   .strengths li:hover {
@@ -272,6 +327,10 @@ const cases = projects.filter((project) => project.data.screens?.length);
     padding-block: 1.4rem;
     border-bottom: 1px solid var(--line);
     transition: background 0.2s ease;
+  }
+
+  .experience > ol > li:last-child {
+    border-bottom: 0;
   }
 
   .experience > ol > li:hover {
@@ -372,3 +431,48 @@ const cases = projects.filter((project) => project.data.screens?.length);
     }
   }
 </style>
+
+<script>
+  // Активной считается работа, пересёкшая середину экрана: rootMargin сжимает
+  // область наблюдения до линии по центру, поэтому активной всегда ровно одна.
+  const setupBackdrop = () => {
+    const layer = document.querySelector<HTMLElement>('[data-backdrop-layer]');
+    if (!layer) return;
+
+    const cases = document.querySelectorAll<HTMLElement>('.case[data-backdrop]');
+    if (!cases.length) return;
+
+    // На мобильных .scroller не прокручивается — там наблюдаем за окном.
+    const scroller = document.querySelector('.scroller');
+    const root =
+      scroller instanceof HTMLElement && scroller.scrollHeight > scroller.clientHeight
+        ? scroller
+        : null;
+
+    const active = new Set<HTMLElement>();
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const target = entry.target as HTMLElement;
+          if (entry.isIntersecting) active.add(target);
+          else active.delete(target);
+        }
+
+        const current = [...active].pop();
+        if (current) {
+          layer.style.setProperty('--backdrop-color', current.dataset.backdrop || '');
+          layer.classList.add('is-on');
+        } else {
+          layer.classList.remove('is-on');
+        }
+      },
+      { root, rootMargin: '-50% 0px -50% 0px' },
+    );
+
+    cases.forEach((section) => io.observe(section));
+  };
+
+  setupBackdrop();
+  document.addEventListener('astro:page-load', setupBackdrop);
+</script>

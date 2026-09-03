@@ -44,6 +44,10 @@ const ratio = first ? first.src.width / first.src.height : 780 / 1688;
 <style>
   .strip {
     --cell-w: calc(var(--cell-h) * var(--cell-ratio));
+    /* Зазор пропорционален ячейке — иначе на большом мониторе скрины
+       высотой 900px стоят с тем же просветом, что и 540px на ноутбуке.
+       0.045 подобрано так, чтобы на ноутбуке остались привычные ~24px. */
+    --cell-gap: clamp(16px, calc(var(--cell-h) * 0.045), 48px);
 
     overflow-x: auto;
     overscroll-behavior-x: contain;
@@ -70,7 +74,7 @@ const ratio = first ? first.src.width / first.src.height : 780 / 1688;
   .strip ul {
     display: flex;
     width: max-content;
-    gap: 24px;
+    gap: var(--cell-gap);
     margin: 0;
     /* Справа — хвост, чтобы в конце прокрутки последний скрин отступал от края */
     padding: 0 var(--strip-tail, 40px) 0 0;
@@ -79,7 +83,7 @@ const ratio = first ? first.src.width / first.src.height : 780 / 1688;
 
   /* Слева — место под неподвижную карточку описания */
   .strip.has-lead ul {
-    padding-left: calc(var(--info-w) + 24px);
+    padding-left: calc(var(--info-w) + var(--cell-gap));
   }
 
   .strip li {
@@ -98,9 +102,10 @@ const ratio = first ? first.src.width / first.src.height : 780 / 1688;
     user-select: none;
   }
 
+  /* Мобильная версия делается отдельно — там зазор пока прежний */
   @media (max-width: 56rem) {
-    .strip ul {
-      gap: 16px;
+    .strip {
+      --cell-gap: 16px;
     }
   }
 </style>

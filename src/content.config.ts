@@ -33,6 +33,9 @@ const projects = defineCollection({
       coverVideo: z.string().optional(),
       // Два-три предложения для колонки описания в блоке кейса
       summary: z.string().optional(),
+      // Цвет подложки под работой на главной. Подложка одна на все кейсы,
+      // при смене экрана перекрашивается с переходом.
+      backdrop: z.string().optional(),
       // Поля карточки: слева подпись, справа значение
       years: z.string().optional(),
       role: z.string().optional(),

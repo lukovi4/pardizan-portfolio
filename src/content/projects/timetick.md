@@ -12,6 +12,7 @@ years: 2023 — 2025
 role: Senior Product Designer
 cover: ../../assets/covers/timetick.png
 coverAlt: TimeTick monitoring dashboard on a laptop
+backdrop: '#E3E0EF'
 summary: >-
   An AI-driven low-code platform for behavioral testing and monitoring of IoT
   software, built for QA, engineers, and business users. Sole designer on an
