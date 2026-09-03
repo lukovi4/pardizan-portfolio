@@ -45,139 +45,110 @@ facts:
   - label: Education
     value: BEng, Belarusian National Technical University
 experience:
-  - role: Independent Product Designer & AI Product Builder
-    period: 2026 — Current
-    description:
-      - >-
-        Designed and shipped Lastik, a live mobile game: product concept, UX/UI,
-        visual system, AI-assisted implementation workflow, testing, and App Store
-        release.
-      - >-
-        Developed mobile product concepts into UX architecture, interaction flows,
-        prototypes, and working builds, using AI-assisted workflows to validate
-        product behavior earlier in the design process.
   - role: Senior Product Designer
-    company: Infomediji / DeoVR
-    period: 2024 — 2026 · Poland
+    company: Infomediji (DeoVR)
+    period: Oct 2024 — May 2026 · Poland
     description:
       - >-
-        Designed spatial UX for video discovery, navigation, playback, onboarding,
-        and activation flows across VR and web surfaces.
+        Designed and launched a full rebuild of the VR-headset application,
+        restructuring its UX architecture, end-to-end flows, and interaction model.
       - >-
-        Created interaction patterns for hand tracking, depth, spatial navigation,
-        immersive playback controls, and VR-specific interface behavior.
-      - Built and tested interactive prototypes directly in VR using AI-assisted workflows.
+        Redesigned and launched the WebXR experience across video discovery,
+        navigation, playback, onboarding, and subscriptions.
       - >-
-        Designed and tested onboarding and subscription activation experiments across
-        VR and web surfaces, contributing to improved paid-conversion flow clarity and
-        reduced activation friction.
+        Designed VR-specific interactions for hand tracking, depth, spatial
+        navigation, and immersive playback controls.
+      - >-
+        Designed and built “Figma Mirror for VR,” an internal WebXR tool for
+        importing Figma elements, configuring spatial prototypes, and reviewing or
+        presenting them directly in a headset, using AI-assisted development.
   - role: Senior Product Designer
     company: NerdWallet
-    period: 2023 — 2024 · Poland
+    period: Jan 2023 — Aug 2024 · Poland
     description:
       - >-
-        Owned end-to-end design for Medicare, Auto, and Home Protection sections across
-        product discovery, UX architecture, multi-step calculators, landing pages,
-        prototyping, A/B testing, and launch support.
+        Owned product design across Medicare, Auto, and Home Protection, from
+        research and hypothesis development through launch and post-launch
+        experimentation.
       - >-
-        Used analytics, experiments, and user behavior insights to improve conversion
-        across insurance, leasing, and financial decision-making flows.
+        Designed and launched a new Auto section for vehicle discovery and
+        selection, including application funnels for auto loans and leasing.
       - >-
-        Improved Medicare conversion from 16% to 31%, auto leasing from 21% to 27%, and
-        auto insurance from 23% to 29%.
+        Designed and launched a new Home Protection section for finding and
+        selecting home-security providers.
       - >-
-        Launched a new Auto section from scratch, including leasing, insurance, and
-        car-buying guide experiences.
-      - >-
-        Worked within a 25-designer organization, contributing to shared design-system
-        patterns and cross-product consistency.
+        Designed and tested multiple Medicare enrollment funnels, refining live
+        experiences based on experiment data.
   - role: Senior Product Designer
-    company: Aura / Pango Group
-    period: 2023 — 2024 · Part-time
-    description:
-      - >-
-        Rebuilt shared design-system patterns across multiple VPN and digital-security
-        products to improve consistency across onboarding, account, and subscription
-        surfaces.
-      - Improved onboarding flows across the VPN product portfolio.
-      - Redesigned user account panels across VPN websites and subscription surfaces.
-      - >-
-        Kept onboarding, account, and subscription patterns consistent across multiple
-        VPN and security product surfaces.
-  - role: Senior Product Designer
-    company: Timetick
+    company: Timetick AI
     period: 2023 — 2025 · Part-time contract
     description:
       - >-
-        Acted as the sole designer, working directly with the CEO and engineering team
-        across product strategy, UX architecture, UI, prototyping, and delivery.
+        Served as the sole designer from concept through launch for an AI-powered
+        IoT testing and monitoring platform, working directly with the CEO,
+        engineers, and clients during product testing.
       - >-
-        Turned an early IoT monitoring concept into a complete web-platform prototype
-        and design system, covering 150+ screens across onboarding, real-time dashboards,
-        behavioral analytics, and low-code workflows.
+        Defined the product’s UX architecture and core workflows across onboarding,
+        automated testing, real-time monitoring, behavioral analytics, device
+        management, and low-code automation.
       - >-
-        Designed onboarding flows, real-time monitoring dashboards, behavioral analytics,
-        and low-code product-building workflows.
-      - >-
-        Structured complex IoT monitoring scenarios into clear product flows, interface
-        logic, and operational dashboards.
-  - role: Senior Product Designer / Lead
+        Created an end-to-end interactive prototype spanning more than 150 screens
+        and a custom design system built on MUI.
+  - role: Senior Product Designer
     company: AppLovin
     period: Mar — Dec 2022 · Belarus
     description:
-      - Owned product design for an internal growth-management tool used by ~50 growth managers.
       - >-
-        Led a small design team of 2 designers and drove UX direction, interface design,
-        prototyping, user interviews, usability testing, and engineering handoff.
+        Designed and launched LionMachine, an internal platform developed from the
+        initial concept for approximately 50 mobile-game growth managers.
       - >-
-        Reduced manual operational work by 2.5–3 hours per day for ~50 growth managers by
-        redesigning the internal growth-management workflow, task structure, error-prone
-        states, and handoff logic.
+        Consolidated workflows previously spread across four to five advertising and
+        analytics services, allowing managers to perform their core tasks within a
+        single product.
       - >-
-        Designed 100+ screens, clickable prototypes, and engineering documentation for
-        implementation.
+        Mapped mobile-advertising workflows through observation, interviews, and
+        stakeholder sessions, then translated complex campaign structures into the
+        platform’s UX architecture, workflows, and production-ready designs.
+      - >-
+        Designed an automated alerting workflow that replaced manual data checks by
+        detecting problems and presenting them directly to growth managers.
   - role: Product Designer
-    company: AzurPro by AzurGames
-    period: 2020 — 2022 · Belarus
+    company: AzurGames (AzurPro)
+    period: Feb 2020 — Mar 2022 · Belarus
     description:
       - >-
-        Drove trial-to-paid conversion improvements across the app portfolio through
-        onboarding redesigns, analytics, A/B testing, and competitive research.
+        Designed onboarding, subscription, and trial experiences across a portfolio
+        of consumer applications, including document scanning, live wallpapers, call
+        recording, and eSIM products.
       - >-
-        Increased trial starts in the Scanner app from 23% to 41% and trial-to-paid
-        conversion from 16% to 23%.
+        Designed and launched an eSIM application from scratch, owning its product
+        architecture, end-to-end user flows, and final UI.
       - >-
-        Designed new mobile apps from scratch: research, product structure, prototype,
-        and launch-ready design.
+        Designed variants for monetization experiments covering onboarding flows,
+        button placement, copy, visual presentation, and animation; created motion
+        assets using After Effects and Lottie.
   - role: Product Designer
-    company: Magisto / Vimeo
-    period: 2017 — 2019 · Israel
+    company: Vimeo (Magisto)
+    period: Aug 2017 — Nov 2019 · Israel
     description:
       - >-
-        Redesigned the core video-editing flow, increasing successful video creation by
-        30% and retention by 7%.
-      - >-
-        Improved onboarding and monetization funnels through A/B testing with analytics
-        and marketing teams, increasing trial users by 16% and trial-to-paid conversion
-        by 6%.
-      - >-
-        Partnered with engineering, analytics, marketing, and product teams on growth
-        experiments and mobile app releases.
+        Designed mobile video-creation experiences across onboarding, editing,
+        activation, and monetization, including a redesign of the core journey from
+        media selection to completed video.
   - role: UX/UI Designer
-    company: Designsters / PixelPlex
-    period: 2012 — 2016 · Belarus
+    company: Designsters & PixelPlex
+    period: Mar 2012 — Jul 2016 · Belarus
     description:
       - >-
-        Designed 40+ products across web and mobile, including e-commerce, social
-        networks, SaaS products, web services, and mobile applications.
-      - >-
-        Worked with development teams on client discovery, requirements, prototypes,
-        wireframes, product specifications, and implementation support.
+        Designed more than 40 web and mobile products across e-commerce, social
+        platforms, SaaS, digital services, and consumer applications, covering
+        discovery, information architecture, prototyping, UI design, specifications,
+        and implementation support.
 links:
   email: lukovich.jenya@gmail.com
   telegram: https://t.me/pardizan
   linkedin: https://www.linkedin.com/in/evgeny-lukovich/
-  resume: https://docs.google.com/document/d/1zNpJHzvRX7IJsWU8S2eXSUVBUh9MZVcg6qgZ_7i4NWk/edit?usp=sharing
+  resume: https://docs.google.com/document/d/1cBd_qqVsrmn5I0XCIHDN5wnXPk5NBzh6GW1M9MnHJCI/edit?usp=sharing
 ---
 
 I turn ambiguous product goals into clear UX architecture, interaction
