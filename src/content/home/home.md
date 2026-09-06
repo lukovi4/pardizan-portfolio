@@ -179,10 +179,4 @@ process taught me to navigate unfamiliar problems, take ownership of decisions,
 and understand how user needs, business priorities, and technical constraints
 shape a product.
 
-I’ve also created and launched web services and mobile products of my own.
-Some succeeded; others taught me the cost of chasing perfection before launch.
-That experience changed how I work: define a thoughtful first version, get it
-into people’s hands, and use what I learn to guide its development. I’m still
-drawn to unfamiliar markets, complex product architecture, and finding
-unconventional solutions—with success measured by how well they work in
-practice.
+I also have experience launching my own web services and mobile products, with both successes and setbacks along the way. That experience taught me the cost of chasing perfection and shaped how I work: focus on what matters, deliver a considered solution, and keep improving it based on real use. I enjoy finding better ways for products to work — whether that means simplifying an everyday interaction, refining an existing flow, or shaping something new.
