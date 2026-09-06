@@ -1,12 +1,28 @@
 ---
 status: Open to work
-headline: Product designer who ships.
-intro: 10+ years designing growth, monetization, and complex product systems for
+# Строка в нижней фиксированной полосе
+footnote: Warsaw, Poland · Authorized to work in Poland · International B2B contracts
+# Каждое предложение — отдельная строка в hero
+headline:
+  - Businesses have goals.
+  - Users have problems.
+  - I design solutions that work for both.
+intro: >-
+  I’m a Senior Product Designer with more than 10 years of experience across
+  mobile apps, web products, SaaS platforms, and VR experiences. I’ve worked
+  with products at different stages — from early concepts and startups to
+  established platforms used by millions — at Vimeo, NerdWallet, AppLovin,
+  and DeoVR.
+# Названия из этого списка становятся ссылками внутри текста intro
 companies:
-  - Vimeo
-  - NerdWallet
-  - AppLovin
-  - DeoVR
+  - name: Vimeo
+    url: https://vimeo.com
+  - name: NerdWallet
+    url: https://www.nerdwallet.com
+  - name: AppLovin
+    url: https://www.applovin.com
+  - name: DeoVR
+    url: https://deovr.com
 cta: Explore selected work
 spec:
   - label: Status
@@ -26,24 +42,30 @@ ticker:
   - A/B testing
   - Mobile & web
   - VR & spatial UX
-strengths:
-  - title: Product Systems & UX Architecture
-    description: Structuring product logic, information architecture, multi-step flows, states, edge cases, cross-surface behavior, and scalable UX patterns.
-  - title: Growth & Monetization Design
-    description: Improving onboarding, activation, conversion, subscription and trial funnels, retention loops, and experiment-driven product iterations.
-  - title: AI-assisted Product Execution
-    description: Turning design decisions into working builds — validating feasibility, reducing handoff gaps, and accelerating the path from concept to release.
-  - title: End-to-end Product Delivery
-    description: From unclear goals and early hypotheses to prototypes, design systems, user testing, engineering handoff, launch support, and iteration.
-  - title: Cross-functional Senior Ownership
-    description: Working with product, engineering, analytics, marketing, and executives to align decisions, reduce ambiguity, and ship measurable improvements.
-facts:
-  - label: Cooperation
-    value: B2B contract (open to discuss)
-  - label: Languages
-    value: English, Russian
-  - label: Education
-    value: BEng, Belarusian National Technical University
+principles:
+  - title: Understand before designing
+    description: >-
+      Before I start designing, I take time to understand the subject, the
+      product, the business behind it, and the people who use it. Whenever
+      possible, I talk to users, customers, and domain experts instead of
+      filling the gaps with assumptions.
+  - title: From complexity to a working product
+    description: >-
+      I break complex products into clear flows, states, and interactions, then
+      turn that structure into detailed UX/UI and prototypes. When it helps the
+      project, I use AI to go beyond a prototype and build a functional MVP.
+  - title: Evidence over assumptions
+    description: >-
+      Whenever possible, I check my design decisions against real evidence —
+      product analytics, experiments, A/B tests, user testing, and feedback.
+      What I measure and how I test it depends on the product, its goals, and
+      the question we need to answer.
+  - title: Independent, not isolated
+    description: >-
+      I can take a problem and move it forward independently while adapting to
+      the way the team works. I involve product and engineering early, discuss
+      trade-offs openly, and ask difficult questions when they help us reach a
+      better solution.
 experience:
   - role: Senior Product Designer
     company: Infomediji (DeoVR)
@@ -151,10 +173,15 @@ links:
   resume: https://docs.google.com/document/d/1cBd_qqVsrmn5I0XCIHDN5wnXPk5NBzh6GW1M9MnHJCI/edit?usp=sharing
 ---
 
-I turn ambiguous product goals into clear UX architecture, interaction
-models, prototypes, and launch-ready product experiences.
+I started learning design when courses were rare and the profession was far
+less structured than it is today. I learned by doing the whole job myself — from
+the first conversation with a client to the final delivery. That made me a
+generalist who is comfortable working with different products, industries, and
+stages of development.
 
-My strongest work sits at the intersection of product thinking, measurable
-business impact, and execution speed — using AI-assisted workflows to
-prototype behavior, test edge cases, and move from hypothesis to shipped
-product faster, without replacing design judgment.
+Since then, I’ve worked with very different businesses and tried launching
+products and startups of my own. This taught me to look beyond the interface and
+consider what users need, what makes sense for the business, and what the team
+can realistically build. What still keeps me interested is getting into
+unfamiliar subjects, untangling complex problems, and seeing whether the
+solutions I design actually work.

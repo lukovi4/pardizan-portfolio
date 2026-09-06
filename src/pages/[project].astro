@@ -4,6 +4,9 @@ import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import StatusBar from '../components/StatusBar.astro';
+import ScreenSlider from '../components/ScreenSlider.astro';
+import Lightbox from '../components/Lightbox.astro';
 
 export async function getStaticPaths() {
   const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(
@@ -36,11 +39,12 @@ const isWide = (screens?: { src: ImageMetadata }[]) =>
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
-<Base title={`${name} — Evgeny Lukovich`} description={tagline}>
+<Base title={`${name} — Evgeny Lukovich`} description={tagline} paged>
   <Header />
+  <StatusBar />
 
-  <main class="case-page">
-    <div class="shell head">
+  <main class="scroller case-page">
+    <section class="head screen shell">
       <h1>{title}</h1>
       {(lead ?? summary) && <p class="lead">{lead ?? summary}</p>}
 
@@ -68,10 +72,12 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
           )
         }
       </dl>
-    </div>
+    </section>
 
-    {
-      sections.map((section) => (
+    {/* Описание длиннее экрана — прокручивается целиком, как Experience */}
+    <div class="chapters screen">
+      {
+        sections.map((section) => (
         <section class="chapter">
           <div class="shell chapter-head">
             <h2>{section.title}</h2>
@@ -83,25 +89,19 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
             </div>
           </div>
 
-          {section.screens && section.screens.length > 0 && (
-            <ul class:list={['shots', 'shell', isWide(section.screens) && 'wide']}>
+          {section.screens && section.screens.length > 0 && isWide(section.screens) && (
+            <ScreenSlider screens={section.screens} />
+          )}
+
+          {section.screens && section.screens.length > 0 && !isWide(section.screens) && (
+            <ul class="shots" data-gallery>
               {section.screens.map((screen) => (
                 <li>
                   <Image
                     src={screen.src}
                     alt={screen.alt}
-                    {...(isWide(section.screens)
-                      ? {
-                          // Одна работа на ряд — во всю ширину колонки текста
-                          widths: [800, 1600, 2400],
-                          sizes: '(max-width: 56rem) 92vw, 1060px',
-                        }
-                      : {
-                          // Четыре в ряд — ячейка около четверти колонки
-                          widths: [300, 600, 900],
-                          sizes:
-                            '(max-width: 36rem) 92vw, (max-width: 56rem) 46vw, (max-width: 64rem) 340px, 260px',
-                        })}
+                    widths={[300, 600, 900]}
+                    sizes="(max-width: 36rem) 92vw, (max-width: 56rem) 46vw, (max-width: 64rem) 340px, 302px"
                     loading="lazy"
                   />
                 </li>
@@ -112,25 +112,28 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       ))
     }
 
-    <nav class="shell next" aria-label="Next case">
-      <span class="cap">Next case</span>
-      <a href={`${base}/${next.data.slug}`}>
-        {next.data.name} <span aria-hidden="true">→</span>
-      </a>
-    </nav>
+      <nav class="shell next" aria-label="Next case">
+        <span class="cap">Next case</span>
+        <a href={`${base}/${next.data.slug}`}>
+          {next.data.name} <span aria-hidden="true">→</span>
+        </a>
+      </nav>
+    </div>
+
+    <Footer />
   </main>
 
-  <Footer />
+  <Lightbox />
 </Base>
 
 <style>
-  .case-page {
-    padding-bottom: clamp(3.5rem, 9vw, 6rem);
-  }
+  /* Первый экран и контакты примагничиваются, описание между ними
+     прокручивается свободно: у .screen высота не меньше экрана, но секция
+     выше экрана просто растёт — привязка срабатывает на её границе. */
 
-  /* ---------- Шапка кейса ---------- */
-  .head {
-    padding-top: calc(var(--header-h) + clamp(2.5rem, 7vw, 5rem));
+  /* Первый раздел описания уже отбит полем экрана */
+  .chapters > .chapter:first-child {
+    margin-top: 0;
   }
 
   h1 {
@@ -201,7 +204,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     margin-top: clamp(3rem, 7vw, 5rem);
   }
 
-  /* Та же сетка, что у Core strengths и Experience: заголовок слева, текст справа */
+  /* Та же сетка, что у Experience: заголовок слева, текст справа */
   .chapter-head {
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
@@ -236,11 +239,17 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   }
 
   /* ---------- Скрины: ряды по четыре, у веба — один на ряд ---------- */
+  /* Шире колонки текста: она остаётся 72rem, скрины идут до 1280px.
+     На узком экране потолок сам опускается до окна за вычетом полей. */
   .shots {
+    max-width: min(1280px, 100% - 2 * var(--gutter));
+    margin-inline: auto;
     margin-top: clamp(1.75rem, 4vw, 2.5rem);
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 24px;
+    /* Список: гасим собственный отступ браузера, раньше это делал .shell */
+    padding: 0;
     list-style: none;
   }
 
@@ -248,9 +257,16 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     grid-template-columns: minmax(0, 1fr);
   }
 
+  /* Скрин ограничен и по ширине, и по высоте: он всегда должен помещаться
+     в экран целиком, как работы на главной. Высота считается так же —
+     окно минус шапка, нижняя полоса и поля. Если ограничила высота, скрин
+     становится уже колонки, поэтому центрируем. */
   .shots :global(img) {
-    width: 100%;
+    width: auto;
+    max-width: 100%;
     height: auto;
+    max-height: calc(100dvh - 2 * var(--header-h) - 2 * var(--panel-pad));
+    justify-self: center;
     border-radius: 14px;
     background: var(--surface);
   }

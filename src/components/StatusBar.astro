@@ -1,0 +1,45 @@
+---
+import { getEntry } from 'astro:content';
+
+const home = await getEntry('home', 'home');
+if (!home) throw new Error('src/content/home/home.md не найден');
+---
+
+{/* Нижняя полоса: зеркало шапки. Живёт в отступе, который окно оставляет снизу. */}
+<div class="site-bar">
+  <div class="shell inner">
+    <p class="cap">{home.data.footnote}</p>
+  </div>
+</div>
+
+<style>
+  .site-bar {
+    /* Как и шапка: скроллится содержимое, а не страница */
+    position: fixed;
+    inset: auto 0 0;
+    /* Выше рамки окна, наравне с шапкой */
+    z-index: 10;
+    background: color-mix(in srgb, var(--paper) 90%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    height: var(--header-h);
+  }
+
+  p {
+    margin: 0;
+  }
+
+  /* На узких экранах строка длинная — прячем, чтобы не ломать вёрстку */
+  @media (max-width: 56rem) {
+    .site-bar {
+      display: none;
+    }
+  }
+</style>

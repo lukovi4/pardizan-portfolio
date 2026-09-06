@@ -31,7 +31,7 @@ const sizes = `(max-width: 56rem) ${Math.round(560 * ratio)}px, ${Math.round(900
     --strip-bleed отрицательный отступ справа, чтобы лента уходила за край
     --info-w      ширина карточки описания — нужна только при lead
 */}
-<div class:list={['strip', lead && 'has-lead']} style={`--cell-ratio: ${ratio}`} data-strip>
+<div class:list={['strip', lead && 'has-lead']} style={`--cell-ratio: ${ratio}`} data-strip data-gallery>
   <ul>
     {
       screens.map((screen) => (

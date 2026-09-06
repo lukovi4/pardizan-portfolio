@@ -3,6 +3,8 @@ import { getCollection, getEntry, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import StatusBar from '../components/StatusBar.astro';
+import Lightbox from '../components/Lightbox.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import ProjectShowcase from '../components/ProjectShowcase.astro';
 
@@ -14,18 +16,23 @@ const projects = (await getCollection('projects', ({ data }) => !data.draft)).so
   (a, b) => a.data.order - b.data.order,
 );
 
-const { headline, intro, companies, strengths, facts, experience } = home.data;
+const { headline, intro, companies, principles, experience } = home.data;
 
-// «Vimeo, NerdWallet, AppLovin, and DeoVR.» — с точкой в конце
-const companyParts = companies.map((name, i) => ({
-  name,
-  sep: i === companies.length - 1 ? '.' : i === companies.length - 2 ? ', and ' : ', ',
-}));
+// Названия компаний внутри intro подставляем ссылками: сам текст остаётся
+// одним предложением в контенте и правится как обычный текст.
+const escapeForRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const companyPattern = new RegExp(`(${companies.map((c) => escapeForRegExp(c.name)).join('|')})`, 'g');
+const introParts = intro
+  .split(companyPattern)
+  .filter(Boolean)
+  .map((part) => ({ text: part, url: companies.find((c) => c.name === part)?.url }));
 
-// Финальный знак заголовка — красным: «…who ships[.]»
-const punct = headline.match(/^(.*?)([.?!])$/);
-const headText = punct ? punct[1] : headline;
-const headMark = punct ? punct[2] : '';
+// Финальный знак последнего предложения — красным: «…for both[.]»
+const headLines = headline.map((line, i) => {
+  if (i < headline.length - 1) return { text: line, mark: '' };
+  const punct = line.match(/^(.*?)([.?!])$/);
+  return punct ? { text: punct[1], mark: punct[2] } : { text: line, mark: '' };
+});
 
 const workRange = `01–${String(projects.length).padStart(2, '0')}`;
 
@@ -43,6 +50,7 @@ const cases = projects.filter((project) => project.data.screens?.length);
   paged
 >
   <Header />
+  <StatusBar />
 
   {/* Неподвижная подложка под работами: цвет берётся у активного кейса */}
   <div class="backdrop" data-backdrop-layer aria-hidden="true"></div>
@@ -52,11 +60,31 @@ const cases = projects.filter((project) => project.data.screens?.length);
 
   <main class="scroller">
     <section id="hero" class="hero screen shell">
-      <h1>{headText}<span class="mark">{headMark}</span></h1>
-      <p class="sub">
-        {intro}{' '}
-        {companyParts.map(({ name, sep }) => <Fragment><strong>{name}</strong>{sep}</Fragment>)}
-      </p>
+      <div class="hero-grid">
+        <h1>
+          {
+            headLines.map(({ text, mark }) => (
+              <span class="line">
+                {text}
+                {mark && <span class="mark">{mark}</span>}
+              </span>
+            ))
+          }
+        </h1>
+        <p class="sub">
+          {
+            introParts.map((part) =>
+              part.url ? (
+                <a href={part.url} target="_blank" rel="noopener">
+                  {part.text}
+                </a>
+              ) : (
+                part.text
+              ),
+            )
+          }
+        </p>
+      </div>
     </section>
 
     {
@@ -76,23 +104,6 @@ const cases = projects.filter((project) => project.data.screens?.length);
     }
 
     {cases.map((project, i) => <ProjectShowcase project={project} anchor={i === 0 ? 'cases' : undefined} />)}
-
-    <section id="strengths" class="strengths screen shell">
-      <div class="section-head">
-        <h2>Core strengths</h2>
-        <span class="cap">01–{String(strengths.length).padStart(2, '0')}</span>
-      </div>
-      <ol>
-        {
-          strengths.map((s) => (
-            <li data-reveal>
-              <h3>{s.title}</h3>
-              <p>{s.description}</p>
-            </li>
-          ))
-        }
-      </ol>
-    </section>
 
     <section id="experience" class="experience screen shell">
       <div class="section-head">
@@ -120,208 +131,30 @@ const cases = projects.filter((project) => project.data.screens?.length);
     </section>
 
     <section id="about" class="about screen shell">
-      <div class="section-head">
-        <h2>About</h2>
-      </div>
-      <div class="bio" data-reveal>
-        <About />
-        <dl class="facts">
+      <div class="about-grid" data-reveal>
+        <div class="bio">
+          <About />
+        </div>
+        <ol class="principles">
           {
-            facts.map((f) => (
-              <div class="fact">
-                <dt class="cap">{f.label}</dt>
-                <dd>{f.value}</dd>
-              </div>
+            principles.map((p) => (
+              <li class="principle">
+                <h3>{p.title}</h3>
+                <p>{p.description}</p>
+              </li>
             ))
           }
-        </dl>
+        </ol>
       </div>
     </section>
     <Footer />
   </main>
 
-  {/*
-    Галерея. <dialog> с showModal() рисуется в верхнем слое браузера — выше
-    рамки окна и любых z-index, поэтому обычная накладка тут не подошла бы.
-    Затемнение, ловушка фокуса и закрытие по Esc — штатные.
-  */}
-  <dialog class="lightbox" data-lightbox aria-label="Project screenshots">
-    <div class="lightbox-body">
-      <img data-lightbox-image alt="" sizes="92vw" />
+  <Lightbox />
 
-      <button class="lb-nav lb-prev" data-lightbox-prev aria-label="Previous screenshot">
-        <span aria-hidden="true">←</span>
-      </button>
-      <button class="lb-nav lb-next" data-lightbox-next aria-label="Next screenshot">
-        <span aria-hidden="true">→</span>
-      </button>
-      <button class="lb-close" data-lightbox-close aria-label="Close gallery">
-        <span aria-hidden="true">✕</span>
-      </button>
-
-      <p class="lb-counter cap" data-lightbox-counter></p>
-    </div>
-  </dialog>
 </Base>
 
 <style>
-  /* ---------- Галерея ---------- */
-  .lightbox {
-    width: 100%;
-    max-width: none;
-    height: 100%;
-    max-height: none;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    /* Прокрутка колесом над галереей не уводит страницу под ней */
-    overscroll-behavior: contain;
-
-    /* Закрытое состояние, оно же конечное при уходе. display и overlay
-       обязаны быть в списке: без них элемент вылетает из верхнего слоя
-       мгновенно и анимация закрытия обрывается. allow-discrete ставится
-       после списка, иначе сокращённая запись его затрёт. */
-    opacity: 0;
-    transform: scale(0.96);
-    transition-property: opacity, transform, display, overlay;
-    transition-duration: 0.25s;
-    transition-timing-function: ease-out;
-    transition-behavior: allow-discrete;
-  }
-
-  .lightbox[open] {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  /* Состояние, с которого начинается появление: без него переходу не от
-     чего отталкиваться и открытие остаётся резким. */
-  @starting-style {
-    .lightbox[open] {
-      opacity: 0;
-      transform: scale(0.96);
-    }
-  }
-
-  .lightbox::backdrop {
-    background-color: rgb(12 11 8 / 0);
-    backdrop-filter: blur(0);
-    -webkit-backdrop-filter: blur(0);
-    transition-property: background-color, backdrop-filter, display, overlay;
-    transition-duration: 0.25s;
-    transition-timing-function: ease-out;
-    transition-behavior: allow-discrete;
-  }
-
-  .lightbox[open]::backdrop {
-    background-color: rgb(12 11 8 / 0.88);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-  }
-
-  @starting-style {
-    .lightbox[open]::backdrop {
-      background-color: rgb(12 11 8 / 0);
-      backdrop-filter: blur(0);
-      -webkit-backdrop-filter: blur(0);
-    }
-  }
-
-  /* Уважение к системной настройке: появление без движения и почти мгновенно */
-  @media (prefers-reduced-motion: reduce) {
-    .lightbox,
-    .lightbox::backdrop {
-      transform: none;
-      transition-duration: 0.01ms;
-    }
-  }
-
-  .lightbox-body {
-    position: relative;
-    height: 100%;
-    display: grid;
-    place-items: center;
-    padding: clamp(1rem, 4vw, 3rem);
-  }
-
-  .lightbox img {
-    max-width: 92vw;
-    max-height: 86dvh;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    border-radius: 14px;
-    background: var(--surface);
-  }
-
-  .lb-nav,
-  .lb-close {
-    position: absolute;
-    display: grid;
-    place-items: center;
-    border: 0;
-    border-radius: 50%;
-    background: rgb(255 255 255 / 0.12);
-    color: #fff;
-    cursor: pointer;
-    transition:
-      background 0.15s ease,
-      transform 0.15s ease;
-  }
-
-  .lb-nav:hover,
-  .lb-close:hover {
-    background: rgb(255 255 255 / 0.24);
-  }
-
-  .lb-nav:active {
-    transform: translateY(-50%) scale(0.94);
-  }
-
-  .lb-nav {
-    top: 50%;
-    transform: translateY(-50%);
-    width: 3.25rem;
-    height: 3.25rem;
-    font-size: 1.35rem;
-  }
-
-  .lb-prev {
-    left: clamp(0.75rem, 2.5vw, 2rem);
-  }
-
-  .lb-next {
-    right: clamp(0.75rem, 2.5vw, 2rem);
-  }
-
-  /* Одна работа в списке — листать нечего */
-  .lightbox[data-single] .lb-nav,
-  .lightbox[data-single] .lb-counter {
-    display: none;
-  }
-
-  .lb-close {
-    top: clamp(0.75rem, 2.5vw, 2rem);
-    right: clamp(0.75rem, 2.5vw, 2rem);
-    width: 2.75rem;
-    height: 2.75rem;
-    font-size: 1rem;
-  }
-
-  .lb-close:active {
-    transform: scale(0.94);
-  }
-
-  .lb-counter {
-    position: absolute;
-    bottom: clamp(0.75rem, 2.5vw, 2rem);
-    left: 50%;
-    transform: translateX(-50%);
-    color: rgb(255 255 255 / 0.7);
-    font-variant-numeric: tabular-nums;
-  }
-
   /* ---------- Подложка под работами ---------- */
   /* Окно страницы: весь контент живёт внутри него и обрезается его краями.
      Сверху вплотную к шапке, снизу такое же поле, по бокам --panel-inset. */
@@ -394,13 +227,26 @@ const cases = projects.filter((project) => project.data.screens?.length);
     right: var(--gutter);
   }
 
+  /* Сверху утверждение, под ним описание */
+  .hero-grid {
+    display: grid;
+    gap: clamp(1.5rem, 3.5vw, 2.5rem);
+  }
+
   h1 {
     font-weight: 600;
-    font-size: clamp(3rem, 9vw, 7rem);
-    line-height: 0.98;
-    letter-spacing: -0.04em;
-    text-wrap: balance;
-    max-width: 12ch;
+    /* Заголовок во всю ширину: кегль подобран так, чтобы самое длинное
+       предложение помещалось в строку целиком. */
+    font-size: clamp(2rem, 5vw, 3.75rem);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+
+  /* Предложение с новой строки; длинное переносится само. balance здесь
+     нельзя: он делит поровну и короткое предложение рвётся надвое. */
+  h1 .line {
+    display: block;
+    text-wrap: pretty;
   }
 
   .mark {
@@ -408,15 +254,23 @@ const cases = projects.filter((project) => project.data.screens?.length);
   }
 
   .sub {
-    margin-top: 1.5rem;
-    max-width: 34rem;
-    font-size: 1.05rem;
-    color: var(--muted);
+    max-width: 800px;
+    font-size: 18px;
+    color: var(--ink);
   }
 
-  .sub strong {
-    color: var(--ink);
-    font-weight: 500;
+  /* Компании: тонкое серое подчёркивание, по наведению — фирменное жёлтое */
+  .sub a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+    transition: text-decoration-color 0.15s ease;
+  }
+
+  .sub a:hover {
+    text-decoration-color: var(--brand);
   }
 
   /* ---------- Заголовки секций ---------- */
@@ -435,7 +289,6 @@ const cases = projects.filter((project) => project.data.screens?.length);
 
   /* Поля равны краю окна плюс воздух — иначе рамка срезала бы низ текста */
   .work,
-  .strengths,
   .experience,
   .about {
     padding-block: calc(var(--header-h) + 1rem);
@@ -450,46 +303,6 @@ const cases = projects.filter((project) => project.data.screens?.length);
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: clamp(2.5rem, 6vw, 4.5rem) clamp(1.5rem, 3.5vw, 2.5rem);
-  }
-
-  /* ---------- Core strengths ---------- */
-  .strengths ol {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  .strengths li {
-    display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-    gap: 0.5rem 2rem;
-    align-items: baseline;
-    padding-block: 1.4rem;
-    border-bottom: 1px solid var(--line);
-    transition: background 0.2s ease;
-  }
-
-  /* Список не закрывается линией снизу — остаются только разделители */
-  .strengths li:last-child {
-    border-bottom: 0;
-  }
-
-  .strengths li:hover {
-    background: color-mix(in srgb, var(--paper) 96%, var(--ink));
-  }
-
-  .strengths h3 {
-    font-weight: 700;
-    font-size: 18px;
-    letter-spacing: -0.015em;
-    color: #222;
-  }
-
-  .strengths p {
-    font-weight: 400;
-    font-size: 16px;
-    color: #222;
-    max-width: 46rem;
   }
 
   /* ---------- Experience ---------- */
@@ -564,37 +377,79 @@ const cases = projects.filter((project) => project.data.screens?.length);
   }
 
   /* ---------- About ---------- */
-  /* Первый абзац — editorial-лид, крупнее и чернилами */
+  /* Экран делится пополам: слева одна большая плитка с описанием,
+     справа сетка 2×2 из плиток поменьше. Зазор всюду 8px, поэтому
+     обе половины читаются как одна композиция, а не два блока. */
+  .about-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  /* Плитки — то же оформление, что у карточки кейса на главной */
+  .bio,
+  .principle {
+    background: var(--surface);
+    border-radius: 14px;
+  }
+
+  .bio {
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* Первый абзац крупнее — он задаёт контраст с мелким текстом плиток */
   .bio :global(p:first-of-type) {
-    font-size: clamp(1.2rem, 2.4vw, 1.5rem);
-    line-height: 1.4;
-    letter-spacing: -0.015em;
+    font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+    line-height: 1.5;
+    letter-spacing: -0.01em;
     color: var(--ink);
-    max-width: 32ch;
   }
 
   .bio :global(p + p) {
     margin-top: 1.1rem;
-    max-width: 58ch;
     font-size: 1rem;
+    line-height: 1.55;
     color: var(--muted);
   }
 
-  .facts {
-    margin-top: 2.25rem;
+  /* Правая половина: 2×2. Строки равной высоты растягиваются
+     до высоты левой плитки — половины остаются вровень. */
+  .principles {
+    margin: 0;
+    padding: 0;
+    list-style: none;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.25rem 1.5rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 8px;
   }
 
-  .fact dd {
-    margin: 0.25rem 0 0;
-    font-size: 0.95rem;
+  .principle {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .principle h3 {
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+
+  /* Текст в плитках мельче, чем описание слева */
+  .principle p {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    color: var(--muted);
   }
 
   /* ---------- Адаптив ---------- */
   @media (max-width: 56rem) {
-    .strengths li,
     .experience > ol > li {
       grid-template-columns: 1fr;
     }
@@ -606,8 +461,13 @@ const cases = projects.filter((project) => project.data.screens?.length);
       gap: 2.5rem;
     }
 
-    .facts {
+    .about-grid {
       grid-template-columns: 1fr;
+    }
+
+    .principles {
+      grid-template-columns: 1fr;
+      grid-template-rows: none;
     }
   }
 </style>
@@ -655,86 +515,4 @@ const cases = projects.filter((project) => project.data.screens?.length);
 
   setupBackdrop();
   document.addEventListener('astro:page-load', setupBackdrop);
-</script>
-
-<script>
-  // Галерея: клик по скрину открывает его почти во весь экран. Список —
-  // те же скрины этой работы, что и в ленте, поэтому адреса берём прямо
-  // с картинок: srcset у них уже с самым крупным вариантом.
-  const setupGallery = () => {
-    const dialog = document.querySelector<HTMLDialogElement>('[data-lightbox]');
-    if (!dialog || typeof dialog.showModal !== 'function') return;
-
-    const view = dialog.querySelector<HTMLImageElement>('[data-lightbox-image]');
-    const counter = dialog.querySelector<HTMLElement>('[data-lightbox-counter]');
-    if (!view || !counter) return;
-
-    let items: { src: string; srcset: string; alt: string }[] = [];
-    let index = 0;
-
-    const render = () => {
-      const item = items[index];
-      if (!item) return;
-      // srcset ставим первым: иначе браузер успевает скачать запасной src
-      if (item.srcset) view.srcset = item.srcset;
-      else view.removeAttribute('srcset');
-      view.src = item.src;
-      view.alt = item.alt;
-      counter.textContent = `${index + 1} / ${items.length}`;
-    };
-
-    const step = (delta: number) => {
-      if (items.length < 2) return;
-      index = (index + delta + items.length) % items.length;
-      render();
-    };
-
-    document.querySelectorAll<HTMLElement>('[data-strip]').forEach((strip) => {
-      if (strip.dataset.galleryReady) return;
-      strip.dataset.galleryReady = '1';
-
-      // Обработчик всплывающий: перетаскивание ленты гасит клик на этапе
-      // погружения, поэтому протащенный скрин галерею не откроет.
-      strip.addEventListener('click', (event) => {
-        const target = event.target as Element | null;
-        const img = target?.closest?.('img');
-        if (!(img instanceof HTMLImageElement)) return;
-
-        const all = [...strip.querySelectorAll('img')];
-        items = all.map((el) => ({
-          src: el.currentSrc || el.src,
-          srcset: el.getAttribute('srcset') || '',
-          alt: el.alt,
-        }));
-        index = Math.max(0, all.indexOf(img));
-        dialog.toggleAttribute('data-single', items.length < 2);
-        render();
-        dialog.showModal();
-      });
-    });
-
-    dialog.querySelector('[data-lightbox-prev]')?.addEventListener('click', () => step(-1));
-    dialog.querySelector('[data-lightbox-next]')?.addEventListener('click', () => step(1));
-    dialog.querySelector('[data-lightbox-close]')?.addEventListener('click', () => dialog.close());
-
-    // Клик мимо картинки закрывает: цель — сам dialog, а не его содержимое
-    dialog.addEventListener('click', (event) => {
-      if (event.target === dialog || (event.target as Element)?.classList?.contains('lightbox-body')) {
-        dialog.close();
-      }
-    });
-
-    dialog.addEventListener('keydown', (event) => {
-      if (event.key === 'ArrowRight') {
-        event.preventDefault();
-        step(1);
-      } else if (event.key === 'ArrowLeft') {
-        event.preventDefault();
-        step(-1);
-      }
-    });
-  };
-
-  setupGallery();
-  document.addEventListener('astro:page-load', setupGallery);
 </script>

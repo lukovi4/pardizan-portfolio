@@ -44,7 +44,15 @@ const projects = defineCollection({
         .optional(),
       // Лента скринов проекта: ширина ячейки берётся из пропорций первого файла
       screens: z
-        .array(z.object({ src: image(), alt: z.string() }))
+        .array(
+          z.object({
+            src: image(),
+            alt: z.string(),
+            // Длинная версия того же экрана: в галерее прокручивается
+            // внутри рамки короткой
+            full: image().optional(),
+          }),
+        )
         .optional(),
       // Абзац-вступление на странице кейса. Если пусто — берётся summary.
       lead: z.string().optional(),
@@ -57,7 +65,13 @@ const projects = defineCollection({
             // Сноска мелким шрифтом под абзацами
             note: z.string().optional(),
             screens: z
-              .array(z.object({ src: image(), alt: z.string() }))
+              .array(
+                z.object({
+                  src: image(),
+                  alt: z.string(),
+                  full: image().optional(),
+                }),
+              )
               .optional(),
           }),
         )
@@ -71,16 +85,20 @@ const home = defineCollection({
   loader: glob({ pattern: 'home.md', base: './src/content/home' }),
   schema: z.object({
     status: z.string(),
-    headline: z.string(),
+    // Строка в нижней фиксированной полосе
+    footnote: z.string(),
+    // Заголовок hero: по предложению на строку
+    headline: z.array(z.string()),
     intro: z.string(),
-    companies: z.array(z.string()),
+    // Компании, упомянутые в intro: имя подставляется ссылкой
+    companies: z.array(z.object({ name: z.string(), url: z.url() })),
     cta: z.string(),
     // Мono-«спецификация» в hero: Status / Base / Experience
     spec: z.array(z.object({ label: z.string(), value: z.string() })),
     // Бегущая строка навыков между hero и работами
     ticker: z.array(z.string()),
-    strengths: z.array(z.object({ title: z.string(), description: z.string() })),
-    facts: z.array(z.object({ label: z.string(), value: z.string() })),
+    // Плитки в About: заголовок принципа и описание под ним
+    principles: z.array(z.object({ title: z.string(), description: z.string() })),
     // Опыт: слева роль/компания/период, справа описание — тексты из резюме.
     experience: z.array(
       z.object({

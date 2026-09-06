@@ -1,0 +1,214 @@
+---
+import { Image } from 'astro:assets';
+import { prepareScreens, type Screen } from '../lib/screens';
+
+interface Props {
+  screens: Screen[];
+}
+
+const { screens } = Astro.props;
+// Длинные версии готовим заранее: галерея берёт адрес с атрибута картинки
+const prepared = await prepareScreens(screens);
+
+// Пропорции берём у первого кадра: от них считается ширина слайда
+const first = screens[0];
+const ratio = first ? first.src.width / first.src.height : 16 / 10;
+---
+
+{/*
+  Карусель веб-работ. Листается нативной прокруткой со scroll-snap: активный
+  кадр примагничивается по центру, соседи выглядывают по бокам. Свайп на
+  тачпаде и планшете достаётся даром, ручных сдвигов нет.
+*/}
+<div class="slider" style={`--ratio: ${ratio}`}>
+  <ul class="track" data-slider-track data-gallery>
+    {
+      prepared.map((screen) => (
+        <li>
+          <Image
+            src={screen.src}
+            alt={screen.alt}
+            widths={[800, 1600, 2400]}
+            sizes="(max-width: 56rem) 92vw, 1280px"
+            loading="lazy"
+            data-full={screen.fullSrc}
+            data-full-srcset={screen.fullSrcset}
+          />
+        </li>
+      ))
+    }
+  </ul>
+
+  {
+    screens.length > 1 && (
+      <div class="controls">
+        <p class="counter cap" data-slider-counter />
+        <div class="arrows">
+          <button type="button" data-slider-prev aria-label="Previous screen">
+            <span aria-hidden="true">←</span>
+          </button>
+          <button type="button" data-slider-next aria-label="Next screen">
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .slider {
+    --gap: 24px;
+
+    /* Слайд ограничен и по ширине, и по высоте — как и раньше: он должен
+       помещаться в экран целиком. Что сработает первым, то и решает.
+       Проценты здесь использовать нельзя: переменная подставляется туда, где
+       её читают, и 100% разрешился бы относительно ленты, ширина которой сама
+       зависит от слайда. Получался бы круг, и слайд схлопывался. */
+    --slide-max-w: min(1280px, calc(100vw - 2 * var(--gutter)));
+    --slide-max-h: calc(100dvh - 2 * var(--header-h) - 2 * var(--panel-pad));
+    --slide-w: min(var(--slide-max-w), calc(var(--slide-max-h) * var(--ratio)));
+
+    margin-top: clamp(1.75rem, 4vw, 2.5rem);
+  }
+
+  /* Лента во всю ширину: соседние кадры уходят за края экрана, а не
+     упираются в рамку блока. Активный всё равно стоит по центру. */
+  .track {
+    width: 100%;
+    display: flex;
+    gap: var(--gap);
+    margin-block: 0;
+    /* Поля центрируют первый и последний кадр — без них края не встают в центр */
+    padding: 0 calc((100% - var(--slide-w)) / 2);
+    list-style: none;
+
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    overscroll-behavior-x: contain;
+    /* Диагональный свайп не должен уводить вертикальную прокрутку страницы */
+    touch-action: pan-y;
+    scrollbar-width: none;
+  }
+
+  .track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .track li {
+    flex: none;
+    width: var(--slide-w);
+    scroll-snap-align: center;
+    /* Кадр не проскакивают инерцией — шаг всегда один */
+    scroll-snap-stop: always;
+  }
+
+  .track :global(img) {
+    width: 100%;
+    height: auto;
+    border-radius: 14px;
+    background: var(--surface);
+    cursor: zoom-in;
+  }
+
+  /* ---------- Управление ---------- */
+  .controls {
+    width: var(--slide-w);
+    margin: 1rem auto 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .counter {
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .arrows {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  button {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ink);
+    font-size: 1rem;
+    cursor: pointer;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease,
+      opacity 0.15s ease;
+  }
+
+  button:hover:not(:disabled) {
+    background: var(--surface);
+    border-color: var(--muted);
+  }
+
+  /* Не зацикливаем: на краях стрелка гаснет */
+  button:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  @media (max-width: 56rem) {
+    .slider {
+      --gap: 16px;
+      --slide-max-h: 70dvh;
+    }
+  }
+</style>
+
+<script>
+  const setupSliders = () => {
+    document.querySelectorAll<HTMLElement>('[data-slider-track]').forEach((track) => {
+      if (track.dataset.sliderReady) return;
+      track.dataset.sliderReady = '1';
+
+      const slider = track.closest('.slider');
+      const items = [...track.children] as HTMLElement[];
+      if (!slider || items.length < 2) return;
+
+      const prev = slider.querySelector<HTMLButtonElement>('[data-slider-prev]');
+      const next = slider.querySelector<HTMLButtonElement>('[data-slider-next]');
+      const counter = slider.querySelector<HTMLElement>('[data-slider-counter]');
+
+      // Шаг — расстояние между соседними кадрами: ширина слайда плюс зазор.
+      // Считаем по факту, чтобы не дублировать вычисления из стилей.
+      const step = () => items[1].offsetLeft - items[0].offsetLeft;
+      const current = () => Math.round(track.scrollLeft / step());
+
+      const sync = () => {
+        const index = Math.min(items.length - 1, Math.max(0, current()));
+        if (counter) counter.textContent = `${index + 1} / ${items.length}`;
+        if (prev) prev.disabled = index === 0;
+        if (next) next.disabled = index === items.length - 1;
+      };
+
+      const go = (delta: number) => {
+        const index = Math.min(items.length - 1, Math.max(0, current() + delta));
+        track.scrollTo({ left: index * step() });
+      };
+
+      prev?.addEventListener('click', () => go(-1));
+      next?.addEventListener('click', () => go(1));
+
+      // scrollend есть не везде — на прокрутку тоже подписываемся
+      track.addEventListener('scroll', () => requestAnimationFrame(sync), { passive: true });
+      addEventListener('resize', sync);
+      sync();
+    });
+  };
+
+  setupSliders();
+  document.addEventListener('astro:page-load', setupSliders);
+</script>
