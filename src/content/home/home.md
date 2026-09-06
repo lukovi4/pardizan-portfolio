@@ -9,7 +9,7 @@ headline:
   - I design solutions that work for both.
 intro: >-
   I’m a Senior Product Designer with more than 10 years of experience across
-  mobile apps, web products, SaaS platforms, and VR experiences. I’ve worked
+  mobile apps, web products, and VR experiences. I’ve worked
   with products at different stages — from early concepts and startups to
   established platforms used by millions — at Vimeo, NerdWallet, AppLovin,
   and DeoVR.
