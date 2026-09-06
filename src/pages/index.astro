@@ -18,6 +18,10 @@ const projects = (await getCollection('projects', ({ data }) => !data.draft)).so
 
 const { headline, intro, companies, principles, experience } = home.data;
 
+// Карточки принципов спрятаны. Данные и разметка на месте: чтобы вернуть,
+// достаточно поставить true.
+const showPrinciples = false;
+
 // Названия компаний внутри intro подставляем ссылками: сам текст остаётся
 // одним предложением в контенте и правится как обычный текст.
 const escapeForRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -135,16 +139,18 @@ const cases = projects.filter((project) => project.data.screens?.length);
         <div class="bio">
           <About />
         </div>
-        <ol class="principles">
-          {
-            principles.map((p) => (
-              <li class="principle">
-                <h3>{p.title}</h3>
-                <p>{p.description}</p>
-              </li>
-            ))
-          }
-        </ol>
+        {
+          showPrinciples && (
+            <ol class="principles">
+              {principles.map((p) => (
+                <li class="principle">
+                  <h3>{p.title}</h3>
+                  <p>{p.description}</p>
+                </li>
+              ))}
+            </ol>
+          )
+        }
       </div>
     </section>
     <Footer />
@@ -377,31 +383,32 @@ const cases = projects.filter((project) => project.data.screens?.length);
   }
 
   /* ---------- About ---------- */
-  /* Экран делится пополам: слева одна большая плитка с описанием,
-     справа сетка 2×2 из плиток поменьше. Зазор всюду 8px, поэтому
-     обе половины читаются как одна композиция, а не два блока. */
+  /* Описание сверху, под ним четыре плитки в один ряд.
+     Зазор сетки — это расстояние от текста до ряда карточек; между самими
+     карточками свои 8px, они заданы в .principles. */
   .about-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 8px;
+    gap: 60px;
   }
 
   /* Плитки — то же оформление, что у карточки кейса на главной */
-  .bio,
   .principle {
     background: var(--surface);
     border-radius: 14px;
   }
 
+  /* Описание без подложки — текст висит на странице, как в hero.
+     Поэтому и полей нет: строка начинается ровно от левого края первой
+     плитки, иначе текст съезжал бы относительно ряда под ним.
+     Абзацы во всю ширину, друг под другом. */
   .bio {
-    padding: 32px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    padding: 0;
+    max-width: 800px;
   }
 
-  /* Первый абзац крупнее — он задаёт контраст с мелким текстом плиток */
-  .bio :global(p:first-of-type) {
+  /* Все абзацы одинаковые: ни кегль, ни цвет не делят текст на главный
+     и второстепенный. Между абзацами только отступ. */
+  .bio :global(p) {
     font-size: clamp(1.05rem, 1.5vw, 1.2rem);
     line-height: 1.5;
     letter-spacing: -0.01em;
@@ -410,27 +417,20 @@ const cases = projects.filter((project) => project.data.screens?.length);
 
   .bio :global(p + p) {
     margin-top: 1.1rem;
-    font-size: 1rem;
-    line-height: 1.55;
-    color: var(--muted);
   }
 
-  /* Правая половина: 2×2. Строки равной высоты растягиваются
-     до высоты левой плитки — половины остаются вровень. */
+  /* Четыре принципа в один ряд, колонки равной ширины */
   .principles {
     margin: 0;
     padding: 0;
     list-style: none;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 8px;
   }
 
   .principle {
     padding: 24px;
-    display: flex;
-    flex-direction: column;
   }
 
   .principle h3 {
@@ -440,7 +440,7 @@ const cases = projects.filter((project) => project.data.screens?.length);
     letter-spacing: -0.01em;
   }
 
-  /* Текст в плитках мельче, чем описание слева */
+  /* Текст в плитках мельче, чем описание сверху */
   .principle p {
     margin-top: 0.5rem;
     font-size: 0.85rem;
@@ -453,6 +453,11 @@ const cases = projects.filter((project) => project.data.screens?.length);
     .experience > ol > li {
       grid-template-columns: 1fr;
     }
+
+    /* Четыре колонки в ряд становятся слишком узкими для текста — по две */
+    .principles {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
   @media (max-width: 44rem) {
@@ -461,13 +466,8 @@ const cases = projects.filter((project) => project.data.screens?.length);
       gap: 2.5rem;
     }
 
-    .about-grid {
-      grid-template-columns: 1fr;
-    }
-
     .principles {
       grid-template-columns: 1fr;
-      grid-template-rows: none;
     }
   }
 </style>

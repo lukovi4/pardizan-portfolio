@@ -173,15 +173,16 @@ links:
   resume: https://docs.google.com/document/d/1cBd_qqVsrmn5I0XCIHDN5wnXPk5NBzh6GW1M9MnHJCI/edit?usp=sharing
 ---
 
-I started learning design when courses were rare and the profession was far
-less structured than it is today. I learned by doing the whole job myself — from
-the first conversation with a client to the final delivery. That made me a
-generalist who is comfortable working with different products, industries, and
-stages of development.
+I’m a self-taught designer who learned by taking projects from the first
+client conversation through design and implementation. Working across the full
+process taught me to navigate unfamiliar problems, take ownership of decisions,
+and understand how user needs, business priorities, and technical constraints
+shape a product.
 
-Since then, I’ve worked with very different businesses and tried launching
-products and startups of my own. This taught me to look beyond the interface and
-consider what users need, what makes sense for the business, and what the team
-can realistically build. What still keeps me interested is getting into
-unfamiliar subjects, untangling complex problems, and seeing whether the
-solutions I design actually work.
+I’ve also created and launched web services and mobile products of my own.
+Some succeeded; others taught me the cost of chasing perfection before launch.
+That experience changed how I work: define a thoughtful first version, get it
+into people’s hands, and use what I learn to guide its development. I’m still
+drawn to unfamiliar markets, complex product architecture, and finding
+unconventional solutions—with success measured by how well they work in
+practice.

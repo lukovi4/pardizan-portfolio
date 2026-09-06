@@ -5,16 +5,28 @@ const home = await getEntry('home', 'home');
 if (!home) throw new Error('src/content/home/home.md не найден');
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+interface Props {
+  /* Пункт, подсвеченный сразу при отрисовке. На странице кейса это всегда
+     Work: страница целиком относится к работам, следить не за чем.
+     На главной пункт выбирает наблюдатель в скрипте ниже. */
+  active?: 'work' | 'experience' | 'about' | 'contact';
+}
+
+const { active } = Astro.props;
+const current = (key: Props['active']) => (active === key ? 'true' : undefined);
 ---
 
 <header class="site-header">
   <div class="shell inner">
     <a class="wordmark" href={`${base}/#hero`}>Evgeny Lukovich</a>
     <nav aria-label="Main">
-      <a href={`${base}/#cases`}>Work</a>
-      <a href={`${base}/#experience`}>Experience</a>
-      <a href={`${base}/#about`}>About</a>
-      <a href={`${base}/#contact`}>Contact</a>
+      <a href={`${base}/#cases`} data-nav="work" aria-current={current('work')}>Work</a>
+      <a href={`${base}/#experience`} data-nav="experience" aria-current={current('experience')}>
+        Experience
+      </a>
+      <a href={`${base}/#about`} data-nav="about" aria-current={current('about')}>About</a>
+      <a href={`${base}/#contact`} data-nav="contact" aria-current={current('contact')}>Contact</a>
       <a href={home.data.links.resume} target="_blank" rel="noopener">CV</a>
     </nav>
   </div>
@@ -61,7 +73,8 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     padding-block: 0.35rem;
   }
 
-  nav a:hover {
+  nav a:hover,
+  nav a[aria-current] {
     color: var(--ink);
     text-decoration: underline;
     text-decoration-color: var(--brand);
@@ -98,4 +111,89 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
   // Перехват на этапе погружения: иначе клик успеет забрать роутер Astro
   document.addEventListener('click', scrollToHash, true);
+
+  // Прокручивается .scroller, а не документ, поэтому переход по адресу с
+  // якорем ни браузер, ни роутер довести не могут: они двигают окно, а
+  // контейнер остаётся наверху. Это ломало и переход из кейса в раздел
+  // главной, и прямой заход по ссылке вида /#about. Доводим сами.
+  const scrollToCurrentHash = () => {
+    if (!location.hash || location.hash === '#') return;
+    const target = document.querySelector(location.hash);
+    if (!target) return;
+    // instant, а не auto: auto означает «взять значение scroll-behavior из
+    // CSS», а там smooth — и открытие ссылки с якорем превращалось бы в
+    // самопроизвольный отъезд страницы вниз. Здесь нужен мгновенный переход.
+    // Дважды — сразу и следующей задачей: роутер сбрасывает прокрутку уже
+    // после нашего обработчика, одного вызова не хватает.
+    const go = () => target.scrollIntoView({ block: 'start', behavior: 'instant' });
+    go();
+    setTimeout(go, 0);
+  };
+
+  // Активным считается раздел, пересёкший середину экрана: rootMargin сжимает
+  // область наблюдения до линии по центру, поэтому активным всегда ровно один.
+  // Тот же приём, что у подложки под работами на главной.
+  const setupNavSpy = () => {
+    const links = new Map<string, HTMLAnchorElement>();
+    document
+      .querySelectorAll<HTMLAnchorElement>('nav a[data-nav]')
+      .forEach((link) => links.set(link.dataset.nav ?? '', link));
+    if (!links.size) return;
+
+    // Следим только на главной: на странице кейса пункт проставлен на сервере
+    // и не должен меняться, хотя блок контактов там тоже есть.
+    if (!document.getElementById('hero')) return;
+
+    const sections: Array<[HTMLElement, string]> = [];
+    document
+      .querySelectorAll<HTMLElement>('.case')
+      .forEach((section) => sections.push([section, 'work']));
+    for (const key of ['experience', 'about', 'contact']) {
+      const section = document.getElementById(key);
+      if (section) sections.push([section, key]);
+    }
+    if (!sections.length) return;
+
+    const keyOf = new Map(sections);
+    // Прокручивается .scroller, а не окно, — наблюдаем за ним
+    const scroller = document.querySelector('.scroller');
+    const root =
+      scroller instanceof HTMLElement && scroller.scrollHeight > scroller.clientHeight
+        ? scroller
+        : null;
+
+    const active = new Set<HTMLElement>();
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const target = entry.target as HTMLElement;
+          if (entry.isIntersecting) active.add(target);
+          else active.delete(target);
+        }
+
+        // В hero не подсвечен никто: у него нет своего пункта меню
+        const key = active.size ? keyOf.get([...active].pop()!) : undefined;
+        for (const [name, link] of links) {
+          if (name === key) link.setAttribute('aria-current', 'true');
+          else link.removeAttribute('aria-current');
+        }
+      },
+      { root, rootMargin: '-50% 0px -50% 0px' },
+    );
+
+    sections.forEach(([section]) => io.observe(section));
+  };
+
+  const setup = () => {
+    scrollToCurrentHash();
+    setupNavSpy();
+  };
+
+  setup();
+  document.addEventListener('astro:page-load', setup);
+  // Смена только якоря — это не загрузка страницы: ни astro:page-load, ни
+  // прокрутка браузера не сработают, потому что двигать надо .scroller.
+  // Сюда попадают «назад/вперёд» и правка адреса руками.
+  window.addEventListener('hashchange', scrollToCurrentHash);
 </script>
