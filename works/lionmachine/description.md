@@ -1,33 +1,55 @@
-LionMachine — complete tool for managing marketing campaigns
+# LionMachine
 
-This is an internal project of Applovin, the task of which is to help growth managers of the company to run effective advertising campaigns: launch ads, settings, analytics, prediction.
+## Overview
 
-Problem & Solution
+LionMachine is an internal AppLovin platform for managing mobile advertising campaigns. It replaced five tools used by around 50 growth managers, bringing their daily work into one place. Data came from the connected services, while managers worked with it directly in LionMachine.
 
-At the time when we started the project, the company's growth managers had to use 5 different tools (adjust, facebook meta ads, applovin, box and asana) to do their job correctly. This process slowed down the work plus there was a very high risk for managers to make a mistake, because the data had to be constantly compared in different services. The company decided to merge all these services into one - LionMachine.
+**Years:** March–December 2022
+**Role:** Senior Product Designer
+**Scope:** User research, UX architecture, product design, prototyping
 
-My role
+## Challenge
 
-Applovin hired whole separated team for this project and I was among the first to join it as a product designer. There was also a ui specialist in the team, who later helped with the creation of ui-kit and visual style design. Since there was no product manager in the team, only tech lead, some product tasks (describe solutions, talking to stakeholders and etc.) had to be done by me.
+Growth managers used Adjust, Meta Ads, AppLovin, Box, and Asana to manage campaigns. They had to switch between services and compare data manually, which took time and increased the risk of mistakes.
 
-Diving into the topic
+Our task was to bring that functionality into one product and adapt it to the way the managers worked. The platform needed to support both daily campaign management and detailed performance analysis.
 
-As i mentioned it was internal product, thats why i had access to almost all 50 users for whom this project was being developed. When i started i knew absolutely nothing about how the mobile advertising industry works, so for the first month I played the role of junior growth manager. I participated in meetings with managers teams, tried to set up advertising campaigns, conducted interviews with lead managers, studied various materials on the Internet. I recorded all the meetings, analyzed and wrote out key points: how managers work, what actions they do, what they use more often, what they pay attention to, etc. My goal was to understand how managers think. The work done helped me to form a vision of the project, to break it down into logical parts, and to understand where the work should begin.
+## My role
 
-Tools and competitor analysis
+I joined early as the product designer. I researched the managers’ workflows, defined the UX architecture, and designed the flows and prototypes.
 
-After I began to understand the inner workings of this market, I began to analyze the tools used by managers and the only potential competitor - Bidalgo. Almost all services i analyzed directly with the managers who use them. We were interested in both the functional component (what features the service has and what it lacks) and the implementation in terms of user-friendliness. This step allowed us to define the functionality of our final product in detail, as well as to group it logically.
+There was no dedicated product manager, so I also helped describe requirements and discuss solutions with stakeholders. I worked with the tech lead and engineers, while a UI designer who joined later helped with the UI kit and visual design.
 
-Prototyping (design) and testing
+## Approach
 
-Since the main task of the product is to conveniently and quickly solve the managers needs, as well as to save development time (think money), we decided to move with MUI framework, which is easy to customize for our needs both in terms of design and development.
-It was unnecessary and difficult to offer something special for visual design, because the whole project is about working with a lot of data, and it is easiest to work with them when they are arranged in a table, so my task was to design the elements (filters, buttons, search, settings, etc.) as user-friendly and logically as possible, so that managers on an intuitive level understand how to work with this system.
+Mobile advertising was new to me, so I spent the first month learning how growth managers worked. I joined their meetings, tried setting up campaigns, and interviewed lead managers. As this was an internal product, I had access to nearly all of its future users.
 
-AutoAlerts
+I documented their daily tasks, the information they used, and the steps they repeated. I then reviewed their existing tools alongside the managers who used them and looked at Bidalgo as a competing product. Together, we identified which features they relied on, what was missing, and what was difficult to use.
 
-As I mentioned above, at first I worked directly with managers in the team, studied how they use different products, and noticed that every day they do the same thing: they evaluate the overall performance of the advertising campaign, if any of the indicators does not meet expectations (expected ROI 25%, but the real 20%), the manager goes deeper into researching it to find the reason/place where something went wrong. Such work on average takes from 1 to 3 hours, while the manager goes through the whole hierarchy of the campaign and finds the right indicator, and he has from 10 to 20 games in work, so overall work could take more than week, which leads to losses for the company (lost profits).
+This helped us decide what LionMachine needed to include and how to organise it. Throughout the project, I reviewed and tested most design decisions with managers. We discussed what worked, what needed to change, and agreed on solutions together.
 
-I had the idea that this process could be optimized with the help of "smart algorithms", which we later called AA (auto alerts). The idea was that the manager, when launching a new advertising campaign, would specify in AA the final indicators he wanted to get, set up the frequency and depth of checking these indicators, and launch the advertisement. In case the metrics were lower than specified, the system did its own analysis of where the failure occurred and sent the manager an alert (web, email, slack), but with specific instructions on where something went wrong. This way, the manager skipped the step of finding the problem and went straight to finding a solution. It was possible to implement such a system only when we could receive all relevant data from other services, so it was decided to postpone it until the launch of the main functionality.
+## Key decisions
 
-Before starting work on AA, we needed to validate the idea, so I designed the functionality and built clickable prototype. We presented it to 10 top growth managers, got their full approval and comments on the prototype, then final design, development, testing, release.
+### Keeping campaign work in one place
 
+I designed the main workspace around a table where managers could compare metrics and move through the campaign hierarchy, from an app down to individual ads and creatives.
+
+Managers could adjust columns, apply filters, and save those settings for later. This meant they could return to the views they needed without setting them up again each time. Metrics were labelled by source so it was clear where the data came from.
+
+We used MUI as the base for the interface to make implementation easier and keep components consistent. I focused on the table structure, navigation, filters, search, and settings.
+
+### Finding underperforming ads with AutoAlerts
+
+While working with managers, I noticed how much time they spent finding the ads behind a drop in campaign performance. When a metric missed its target, they had to go through the campaign hierarchy to find the ad or creative that was underperforming.
+
+I proposed AutoAlerts to handle this search. Managers could set the metrics they wanted to track, the conditions for an alert, and how often the checks should run. The system would find the ad or creative that met those conditions and send a notification through the platform, email, or Slack.
+
+AutoAlerts showed managers where to look. They still needed to understand why the ad was underperforming and decide what to do next.
+
+I designed the flow and a clickable prototype, then reviewed it with managers before moving into final design, development, and testing.
+
+## Outcome
+
+LionMachine launched and replaced the five separate tools in the managers’ daily workflow. They could manage campaigns and analyse performance in one place.
+
+After AutoAlerts launched, managers reported saving around 2.5–3 hours per day in a team survey. They spent less time searching for underperforming ads and could focus on deciding how to improve them.

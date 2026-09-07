@@ -1,28 +1,57 @@
-Animi — animated stories & video reels templates
+# Animi
 
-Animi is a video editor where users can create stories and reels for instagram, videos for tiktok or slideshows using ready-to-use templates, animated text, graphics and music.In this project I acted as a product designer, part manager, and was also involved in the creation of animated content. Since I was the only designer in the team, my tasks included: researching competitors (functional part and design solutions), communicating with users, designing the interface, designing visual part, creating the design system, prepare and describe design for the developers.
+## Overview
 
-Research
+Animi is an iOS video editor for creating Instagram stories and reels, TikTok videos, and slideshows using templates, animated text, graphics, and music.
 
-This is not a unique project on the market (the technology of animation creation is unique), so you can find enough competitors in the stores.
-At the first stage I chose 5 main competitive applications that have more than 600 thousand downloads per month, and focused on studying their functionality. At this stage I was interested in the features that these apps provide to the user, while noting interesting ux solutions.
-In the second stage, I studied user reviews in stores (despite the fact that Animi is developed only for iOS, I was also interested in reviews on Android). I was interested in reviews with ratings from 1 to 3, because there i can find great insights into what users are missing or dissatisfied with.
-I was given the opportunity to talk to active users of competitive apps, so at the last stage of the research I prepared a mini-survey, and I had more than 20 hours of communication with the opportunity to find out the users "pain" of using these apps, as well as to find out what they like and what they miss.
+The technology behind it made creating and adding new templates quick and straightforward. For users, the goal was to offer a large content library and more freedom to edit animations within each template.
 
-Prototype
-Testing
+**Years:** 2020–2022
+**Role:** Product Designer
+**Scope:** UX/UI design, prototyping, design system, animated content, development support
 
-After analyzing the collected information, I started working on the prototype of the future app. Because the target audience is active users of instagram and tiktok, it was decided to follow their patterns and ux, so that it would be intuitive for users. We moved by sections: homepage plus all secondary pages, stories editor, reels editor, etc. For each of the sections I created a detailed* clickable prototype with real sizes of buttons/fonts/elements, creating a library of components in parallel.
-We tested each prototype with users, I made a list of scenarios that I wanted to test and watched users in real time as they executed those scenarios, then we discussed different solutions and ideas. Since we talked to different users and sometimes got completely opposite comments, my job was to find a compromise that everyone (in some cases at least most of them) would like.
-As a result of this step, we got a finished prototype of the whole application, which was verified and approved by users, plus most of the components that could be quickly and easily customized to get the final design.
+## Challenge
 
-* I follow this approach, because detailed prototypes are more convenient to test on users, time spent on such work is more only by 10-15% at most than on the creation of prototypes of small detail, and later it is much easier to bring them to the final design
+Animi was entering a crowded category of video editors. We wanted to combine the convenience of ready-made templates with the flexibility to change their animation.
 
-DESIGN
+The design needed to make finding, editing, and combining content straightforward for people already creating videos for Instagram and TikTok.
 
-As I have already mention above, our target audience is active users of Instagram and Tiktok, so we decided not to experiment with the visual part and try to make the interface intuitive, pleasant, while not making a complete copy of social networks and competitors.The final design was also undergoing testing by users.
+## My role
 
-AMPLITUDE
+I was the only designer on the team. I designed the app’s UX/UI, built the component library and interactive prototypes, and created animated templates.
 
-Together with the manager we prepared events and their descriptions, as well as made a plan for testing and determined which indicators we were interested in.
+I also helped manage development. I wrote tasks for programmers, discussed how features should work, reviewed completed tasks, and checked the implementation against the design.
 
+## Approach
+
+I spoke with active users of competing apps to gather their feedback, ideas, and suggestions. We discussed what they liked, what frustrated them, and what they wanted from a video editor.
+
+I worked through the app section by section, covering the home screen, template browsing, and the stories and reels editors. For each section, I prepared detailed designs and clickable prototypes while building the component library.
+
+I worked closely with the developers to explain interactions, answer questions, and review their implementation.
+
+## Key decisions
+
+### Making editing feel familiar
+
+The audience was already familiar with Instagram and TikTok, so I used familiar interaction patterns as a starting point for navigation and editing.
+
+The aim was to make the app easy to understand while giving users room to customise the templates and animations.
+
+### Building detailed prototypes and reusable components
+
+I used detailed prototypes to show how screens and interactions connected. They gave the developers a practical reference for the behaviour I was designing.
+
+I built reusable components alongside the prototypes, then carried them into the final UI. This helped keep shared elements consistent across the app.
+
+### Working on both the editor and its content
+
+Alongside the interface, I created animated templates for the app. My work covered both the tools people would use to edit videos and the content they would start with.
+
+I also followed the work through development, checking completed features and discussing changes with the programmers.
+
+## Outcome
+
+I created the app’s UX/UI, interactive prototypes, a reusable design system, and animated templates. I also supported development through task planning and implementation reviews.
+
+Together with the manager, I defined events and the metrics we wanted to track in Amplitude, preparing the analytics plan for evaluating how people would use the app.

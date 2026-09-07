@@ -58,9 +58,9 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     display: flex;
     flex-direction: column;
     padding: 40px;
-    /* Фон страницы стал белым, поэтому карточка держится на едва заметной
-       подложке — иначе описание сливалось бы с фоном. */
-    background: var(--surface);
+    /* Карточка белая: под работами лежит цветная подложка, и белое поле
+       описания отделяется от неё само. */
+    background: var(--paper);
     border-radius: 14px;
   }
 

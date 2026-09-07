@@ -1,28 +1,32 @@
 ---
-title: Animi — animated stories & video reels templates
+title: Animi
 name: Animi
 slug: animi
 order: 1
 tagline: Video editor for Instagram stories & reels — templates, animated text, music · iOS
 roles:
-  - User research
+  - UX/UI design
   - Prototyping
-  - UI design
   - Design system
+  - Animated content
+  - Development support
 cover: ../../assets/covers/animi.png
 coverAlt: Animi app home screen with story templates on an iPhone
 backdrop: '#EDE6DA'
 years: 2020 — 2022
 role: Product Designer
 summary: >-
-  A video editor for Instagram stories and reels — ready-made templates,
-  animated text, graphics, and music. I was the only designer on the team:
-  competitor research, 20+ hours of user interviews, clickable prototypes
-  tested with real users, the final UI, and the design system.
+  Animi is an iOS video editor for creating Instagram stories and reels, TikTok
+  videos, and slideshows using templates, animated text, graphics, and music.
+  The technology behind it made creating and adding new templates quick and
+  straightforward. For users, the goal was to offer a large content library and
+  more freedom to edit animations within each template.
 lead: >-
-  Animi is a video editor where people build Instagram stories and reels,
-  TikTok videos, and slideshows out of ready-made templates, animated text,
-  graphics, and music.
+  Animi is an iOS video editor for creating Instagram stories and reels, TikTok
+  videos, and slideshows using templates, animated text, graphics, and music.
+  The technology behind it made creating and adding new templates quick and
+  straightforward. For users, the goal was to offer a large content library and
+  more freedom to edit animations within each template.
 screens:
   - src: ../../assets/projects/animi/onboarding.png
     alt: Animi onboarding screen
@@ -45,65 +49,72 @@ screens:
   - src: ../../assets/projects/animi/export.png
     alt: Animi export screen
 sections:
+  - title: Challenge
+    body:
+      - >-
+        Animi was entering a crowded category of video editors. We wanted to
+        combine the convenience of ready-made templates with the flexibility to
+        change their animation.
+      - >-
+        The design needed to make finding, editing, and combining content
+        straightforward for people already creating videos for Instagram and
+        TikTok.
   - title: My role
     body:
       - >-
-        I joined as the product designer and, with no dedicated manager on the
-        team, picked up part of that work as well — including the production of
-        the animated content itself.
+        I was the only designer on the team. I designed the app’s UX/UI, built
+        the component library and interactive prototypes, and created animated
+        templates.
       - >-
-        Being the only designer meant owning the whole chain: competitor
-        research covering both features and design decisions, talking to users,
-        designing the interface and the visual language, building the design
-        system, and preparing the specs the developers worked from.
-  - title: Research
+        I also helped manage development. I wrote tasks for programmers,
+        discussed how features should work, reviewed completed tasks, and
+        checked the implementation against the design.
+  - title: Approach
     body:
       - >-
-        Animi is not a unique product on the market — the animation technology
-        behind it is, but the category itself is crowded, so there was plenty
-        to learn from.
+        I spoke with active users of competing apps to gather their feedback,
+        ideas, and suggestions. We discussed what they liked, what frustrated
+        them, and what they wanted from a video editor.
       - >-
-        First I picked five leading competitors with more than 600,000
-        downloads a month and worked through their functionality: which
-        features they give the user, and which UX decisions were worth taking
-        note of.
+        I worked through the app section by section, covering the home screen,
+        template browsing, and the stories and reels editors. For each section,
+        I prepared detailed designs and clickable prototypes while building the
+        component library.
       - >-
-        Then I went through store reviews — including Android ones, even though
-        Animi shipped on iOS only. I focused on ratings from one to three
-        stars: that is where users say what they are missing and what they are
-        unhappy with.
-      - >-
-        Finally, I got access to active users of the competing apps. I prepared
-        a short survey and spent more than 20 hours talking to them, collecting
-        the real pain of using these products alongside what they liked and
-        what they wished existed.
-  - title: Prototype & testing
+        I worked closely with the developers to explain interactions, answer
+        questions, and review their implementation.
+  - title: Key decisions
+    heading: Making editing feel familiar
     body:
       - >-
-        With the research in hand I started on the prototype. Our audience
-        lives in Instagram and TikTok, so we deliberately followed their
-        patterns and interaction models to keep the app intuitive. We moved
-        section by section: the home screen and all its secondary pages, the
-        stories editor, the reels editor, and so on.
+        The audience was already familiar with Instagram and TikTok, so I used
+        familiar interaction patterns as a starting point for navigation and
+        editing.
       - >-
-        For every section I built a detailed clickable prototype with real
-        button sizes, fonts, and elements, growing the component library in
-        parallel.
+        The aim was to make the app easy to understand while giving users room
+        to customise the templates and animations.
+  - title: Key decisions
+    heading: Building detailed prototypes and reusable components
+    body:
       - >-
-        We tested each prototype with users. I wrote out the scenarios I wanted
-        to check, watched people run them in real time, then discussed
-        alternatives and ideas. Feedback was often directly contradictory, so
-        my job was to find the compromise that worked for everyone — or at
-        least for most of them.
+        I used detailed prototypes to show how screens and interactions
+        connected. They gave the developers a practical reference for the
+        behaviour I was designing.
       - >-
-        The step produced a finished prototype of the entire app, validated and
-        approved by users, plus most of the components ready to be turned into
-        the final design.
-    note: >-
-      I keep working this way on purpose: detailed prototypes are easier to test
-      on users, they cost at most 10–15% more time than rough ones, and they are
-      far quicker to bring to a final design afterwards.
-    screens:
+        I built reusable components alongside the prototypes, then carried them
+        into the final UI. This helped keep shared elements consistent across
+        the app.
+  - title: Key decisions
+    heading: Working on both the editor and its content
+    body:
+      - >-
+        Alongside the interface, I created animated templates for the app. My
+        work covered both the tools people would use to edit videos and the
+        content they would start with.
+      - >-
+        I also followed the work through development, checking completed
+        features and discussing changes with the programmers.
+  - screens:
       - src: ../../assets/projects/animi/onboarding.png
         alt: Animi onboarding, first step
       - src: ../../assets/projects/animi/onboarding-2.png
@@ -116,16 +127,7 @@ sections:
         alt: Animi template library
       - src: ../../assets/projects/animi/library-2.png
         alt: Animi template library, category view
-  - title: Design
-    body:
-      - >-
-        Since the audience were active Instagram and TikTok users, we chose not
-        to experiment with the visual language. The interface had to feel
-        intuitive and pleasant without turning into a copy of the social
-        networks or the competitors.
-      - >-
-        The final design went through user testing as well.
-    screens:
+  - screens:
       - src: ../../assets/projects/animi/market.png
         alt: Animi template market
       - src: ../../assets/projects/animi/filled-template.png
@@ -150,10 +152,14 @@ sections:
         alt: Animi export screen
       - src: ../../assets/projects/animi/export-progress.png
         alt: Animi export progress screen
-  - title: Analytics
+  - title: Outcome
     body:
       - >-
-        Together with the manager I prepared the event taxonomy and its
-        documentation, wrote the testing plan, and defined which metrics we
-        actually wanted to watch in Amplitude.
+        I created the app’s UX/UI, interactive prototypes, a reusable design
+        system, and animated templates. I also supported development through
+        task planning and implementation reviews.
+      - >-
+        Together with the manager, I defined events and the metrics we wanted to
+        track in Amplitude, preparing the analytics plan for evaluating how
+        people would use the app.
 ---

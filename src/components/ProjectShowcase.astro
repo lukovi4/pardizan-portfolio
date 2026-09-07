@@ -15,7 +15,8 @@ const { screens = [], backdrop } = project.data;
 
 <section id={anchor} class="case screen" data-backdrop={backdrop}>
   <!-- Лента листается трекпадом, свайпом и перетаскиванием мыши.
-       Описание лежит отдельным слоем — оно не участвует в прокрутке. -->
+       Описание лежит отдельным слоем: скрины проходят под ним, а слева от
+       карточки не появляются — лента начинается ровно от её левого края. -->
   <div class="case-body">
     <div class="pin">
       <CaseInfo project={project} />
@@ -62,6 +63,11 @@ const { screens = [], backdrop } = project.data;
       calc(var(--cell-h) * 780 / 1688 * 1.5),
       var(--info-max)
     );
+    /* Зазор пропорционален ячейке — иначе на большом мониторе скрины
+       высотой 900px стоят с тем же просветом, что и 540px на ноутбуке.
+       0.045 подобрано так, чтобы на ноутбуке остались привычные ~24px.
+       Задан здесь, а не в ленте: тем же зазором разделены карточка и лента. */
+    --cell-gap: clamp(16px, calc(var(--cell-h) * 0.045), 48px);
     /* Лента упирается в правый край подложки, хвост в конце прокрутки —
        её внутреннее поле */
     --strip-bleed: 0px;
@@ -74,9 +80,11 @@ const { screens = [], backdrop } = project.data;
       padding-block: 2rem;
       padding-inline: var(--gutter);
       --cell-h: clamp(280px, 62dvh, 560px);
+      --cell-gap: 16px;
       --strip-bleed: calc(-1 * var(--gutter));
       --strip-tail: var(--gutter);
     }
+
   }
 
   .case-body {
@@ -86,7 +94,8 @@ const { screens = [], backdrop } = project.data;
   }
 
   /* Описание вынуто из потока прокрутки: не sticky, а неподвижный слой,
-     поэтому при перетаскивании ленты оно не дрожит. */
+     поэтому при перетаскивании ленты оно не дрожит. Левый край совпадает
+     с левым краем ленты — слева от карточки скринам взяться неоткуда. */
   .pin {
     position: absolute;
     top: 0;

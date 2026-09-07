@@ -1,33 +1,67 @@
-Lastik — simple and fun "time-killer" game
+# Lastik
 
-This is a super simple and addictive game, something between puzzle and trivia, where users need to use their finger as a eraser to open hidden card and give the right answer.This is my concept, so in addition to design I also acted as manager, tester, analyst :)
+## Overview
 
-**Idea validation**
+Lastik is a mobile game where players erase part of a hidden picture and guess what it shows. It combines a simple puzzle mechanic with multiple-choice questions.
 
-It's hard to say now how the idea came about, but I haven't seen similar mechanics in storers so far. So first I wanted to test how interesting it could be for users. For this purpose, I created the simplest basic functionality with a programmer - one screen with several pictures and erase mechanics, and then tested it on 15-20 people from my environment. The users choice was simple - people who have simple games on their phones (3 in a row, hidden objects, crossword puzzles, etc.) and who periodically play them. After receiving positive feedback and useful comments on the mechanics and the game in general, it was time to start full-fledged development.
+I came up with the idea, worked with a developer to launch the first version in 2023, and rebuilt the app myself in 2025 using AI-assisted development.
 
-Prototype, design, implementation
+**Years:** First launch in 2023 · Rebuilt in 2025
+**Role:** Product Designer & Creator
+**Scope:** Concept, UX/UI, prototyping, content direction, development, testing, analytics, monetization
 
-The first step was to describe in detail all my ideas and comments received from users, then I transformed them into a full clickable prototype of the game to test it once again on several users and make final adjustments, plus in the end it saved time for communication with the programmer, because he could be guided by this prototype. Together with the programmer we broke the game into logical components (where it is better to start the development), I prepared a detailed description and created tickets, and then started to create the final design. By the time the programmer made the basis, I already had all the screens and ui kit ready, so I gave them to the developer and started working on illustrations, content and additional elements (screens for the store, commercials, banners, etc.).
+## Challenge
 
-Final testing, release, analytics
+Before investing in a full game, I wanted to find out whether the erase-to-guess mechanic was fun.
 
-After finalizing the development, we used firebase to launch game on closed testing for about 20 people. It was important for us to debug the mechanic of the eraser itself (erasing the picture) plus set up the internal currency, and to do this I asked users to record screens while playing the game. This allowed us to track down users' “lifehacks" that oversimplified the game, and made it easy and uninteresting. A few minor tweaks, and we send the game to release.
-Next steps were setting up amplitude, appsflyer, applovin and a long agonizing war with facebook to get away from me and let me run ads in peace, but that's another story :).
+The next challenge was balancing how much players could reveal, how difficult it was to recognise the picture, and what rewards they earned. Revealing too much made the answer obvious, while the eraser limits needed to leave players enough information to make a guess.
 
-Design
+## My role
 
-Cause the main content of the application is pictures, I wanted to emphasize on them, so I made the interface very minimalistic, intuitive and user-friendly.
+I owned the concept, product design, and coordination of the first version. I created the prototypes and UI, wrote development tasks, reviewed the implementation, and organised testing.
 
-Illustrations
+A graphic designer created the category covers and eraser illustrations. I contributed ideas and helped choose the visual direction. I also prepared content and store assets, and set up analytics and monetization.
 
-Illustrations (category covers, lastiks) were created by a graphic designer, i just helped with ideas. We chose the overall style with the help of a focus group of 20 potential users. Later, I generated some of the covers using neural networks.
+For the 2025 rebuild, I handled development myself with AI assistance.
 
-Game mechanics
+## Approach
 
-Using finger, user can erase a maximum of 50% of the hidden picture, and choose the correct answer from the 10 variants. The less the user has spent eraser, the more coins he will get, which can be exchanged for new categories, or restore lastik for them. Each user has 100% of lastik, which regenerates over time.
+I started with a developer and a small working version: one screen, a few pictures, and the erasing mechanic. I tested it with 15–20 people I knew who played casual mobile games. Their feedback helped me decide to continue.
 
-Monetization
+I then created a full clickable prototype and checked it with several players. Together with the developer, I split the game into parts, decided what to build first, and prepared tasks. While the developer worked on the core functionality, I designed the screens and UI kit.
 
-The game earns money from displaying ads, and there is also an option to purchase a premium account. For watching ads you can restore the eraser, open new categories, get a new eraser, get a second attempt to reply.
+Before release, we ran closed testing with around 20 people. I asked them to record their screens so I could see how they played. These recordings helped me adjust the eraser size and the amount of the picture players could reveal.
 
+## Key decisions
+
+### Balancing clues and rewards
+
+Players could reveal up to half of a picture and choose from ten possible answers. Using less of the eraser earned more coins, giving players a reason to guess before revealing everything.
+
+The eraser regenerated over time. Players could spend coins on new categories or restoring it, so they had a choice between accessing more content and continuing to play.
+
+### Keeping the pictures in focus
+
+The pictures were the main content, so I kept the interface simple and avoided elements that competed with them.
+
+I worked with a graphic designer on the category covers and erasers. We used feedback from a group of potential players to choose the illustration style. Later, I also generated some covers with AI.
+
+### Connecting ads to useful rewards
+
+The original monetization model relied on advertising. Players could watch an ad to restore the eraser, unlock content, or get another attempt at an answer.
+
+These rewards connected monetization to the choices players were already making during the game.
+
+### Rebuilding the app in 2025
+
+I rebuilt the app with faster, simpler flows and improved the performance of its core functionality.
+
+I also created an admin panel to make adding content easier, added in-app purchases, and integrated RevenueCat to manage them.
+
+## Outcome
+
+I launched the first version in 2023 and completed the rebuild in 2025, taking responsibility for both the product experience and its implementation.
+
+After the rebuild, I ran a small paid acquisition test that brought in real players. The economics of acquiring users for an ad-supported game did not work for Lastik, so I decided not to scale it.
+
+The project gave me experience with the full product cycle: testing an idea, designing and building it, releasing it, and deciding whether further investment made sense.

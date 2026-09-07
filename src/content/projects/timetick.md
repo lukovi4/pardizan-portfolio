@@ -1,5 +1,5 @@
 ---
-title: Timetick — advanced IoT testing & monitoring tool
+title: Timetick
 name: Timetick
 slug: timetick
 order: 4
@@ -7,6 +7,7 @@ tagline: AI-driven low-code platform for behavioral IoT testing — 150+ screens
 roles:
   - UX architecture
   - UI design
+  - Prototyping
   - Design system
 years: 2023 — 2025
 role: Senior Product Designer
@@ -14,15 +15,19 @@ cover: ../../assets/covers/timetick.png
 coverAlt: TimeTick monitoring dashboard on a laptop
 backdrop: '#E3E0EF'
 summary: >-
-  An AI-driven low-code platform for behavioral testing and monitoring of IoT
-  software, built for QA, engineers, and business users. Sole designer on an
-  early-stage startup where structure changed every few days: daily design
-  sprints with stakeholders and engineers, a custom system on top of MUI, and
-  150+ screens turned into a full clickable prototype.
+  Timetick is a platform for testing and monitoring IoT software, including EV
+  charging stations. QA engineers and testers can connect real devices or use
+  simulators, run automated tests, trigger actions manually, and check the
+  results in one place. The platform supports testing both sides of the
+  connection: real devices against a virtual server, and backend software
+  against simulated devices.
 lead: >-
-  An AI-driven low-code platform for behavioral testing and monitoring of IoT
-  software. Built for QA engineers, developers, and business users to shorten
-  the development cycle, cut testing costs, and make systems easier to scale.
+  Timetick is a platform for testing and monitoring IoT software, including EV
+  charging stations. QA engineers and testers can connect real devices or use
+  simulators, run automated tests, trigger actions manually, and check the
+  results in one place. The platform supports testing both sides of the
+  connection: real devices against a virtual server, and backend software
+  against simulated devices.
 screens:
   - src: ../../assets/projects/timetick/devices-table.png
     alt: TimeTick device list as a table with type, protocol, status, and tags
@@ -39,55 +44,64 @@ screens:
   - src: ../../assets/projects/timetick/device-issues.png
     alt: Device issues ranked by occurrence, scoring, impact, and error count
 sections:
+  - title: Challenge
+    body:
+      - >-
+        Testing connected devices often involves manual checks, separate tools,
+        and setting up a test environment. Timetick brought these activities
+        together so teams could test device behaviour and find problems before
+        deployment.
+      - >-
+        The product was still taking shape when I joined, and development was
+        already underway. Requirements and logic could change every few days.
+        I needed to turn the team’s ideas into clear workflows while keeping the
+        interface consistent as the product grew.
   - title: My role
     body:
       - >-
-        I joined as the UX lead, brought in to turn the stakeholders' ideas into
-        a coherent, usable web platform — and stayed as the only designer from
-        the first concept through to launch, working directly with the CEO,
-        the engineers, and the clients who tested the product.
+        I was the only designer on the project and designed the entire platform
+        interface. My work covered UX architecture, UI design, interactive
+        prototypes, and the design system.
       - >-
-        It was an early-stage startup, so there was no settled picture of what
-        the product was. Logic and structure could change every two or three
-        days, and the design had to keep up without collapsing each time.
-  - title: Process
+        I worked directly with the CEO and engineers to understand requirements,
+        discuss solutions, and prepare designs for development. I also spoke
+        with the testers who would use the platform to understand their problems
+        and how they handled them.
+  - title: Approach
     body:
       - >-
-        We ran design sprints split by the main sections of the product. Each
-        day I prepared the design or prototype of a set of pages, or of one
-        piece of complex functionality, then we went through it on a call with
-        the stakeholders and the engineers. Their comments went straight back
-        into that section before it was closed.
+        The CEO provided the main product direction. Conversations with testers
+        helped us understand their daily work, while reviewing similar services
+        gave me references for handling unfamiliar tasks and interactions.
       - >-
-        There was no user research on this project. Instead I studied adjacent
-        services, looking for interaction patterns worth borrowing for problems
-        that had already been solved elsewhere.
+        We worked through the product section by section. I prepared designs or
+        prototypes for a workflow, then reviewed them with the CEO and
+        engineers. We discussed the logic, technical constraints, and changes
+        needed before I updated the design.
       - >-
-        The architecture I defined covered onboarding, automated testing,
-        real-time monitoring, behavioral analytics, device management, and
-        low-code automation.
-  - title: Design
+        These regular discussions helped us resolve open questions and adapt the
+        design as requirements changed.
+  - title: Key decisions
+    heading: Building on the team’s existing framework
     body:
       - >-
-        Development had started before I joined and the team was already on MUI,
-        so I built the system on top of it — components, buttons, spacing, sizes
-        — and added custom elements where MUI had nothing to offer.
+        The developers were already using MUI when I joined, so I used it as the
+        foundation for the interface. I built on its components, spacing, and
+        sizing, and added custom elements where the product needed them.
       - >-
-        Over five months that grew into more than 150 screens, assembled into a
-        full clickable prototype of the platform.
-  - title: One list, four ways to read it
+        This kept the design aligned with the framework the engineers were using
+        while allowing us to support more specific workflows.
+  - title: Key decisions
+    heading: Connecting the workflows in a prototype
     body:
       - >-
-        The device list is where everyone starts, and the roles want different
-        things from it: a QA engineer compares protocols and firmware, an
-        operator looks for what is running right now, a manager wants to know
-        where the hardware physically is.
+        I brought the screens together in a clickable prototype so we could
+        review how the different parts of the platform worked together.
       - >-
-        Instead of one compromise view I built four modes over the same data
-        and the same filters — a table for comparing parameters, cards for
-        recognising hardware by sight, a map for location, and an hourly
-        timeline for what is scheduled and when.
-    screens:
+        The prototype gave the team a shared reference for discussing flows and
+        making changes. The first version took around five months. I continued
+        developing and updating it as the product grew.
+  - screens:
       - src: ../../assets/projects/timetick/devices-table.png
         alt: Device list as a table with type, protocol, status, make, model, firmware, and tags
       - src: ../../assets/projects/timetick/devices-cards.png
@@ -96,57 +110,21 @@ sections:
         alt: The same list on a map with a popup card for the selected charger
       - src: ../../assets/projects/timetick/devices-timeline.png
         alt: The same list as an hourly timeline of scheduled and running scenarios
-  - title: Everything about one device
-    body:
-      - >-
-        The device page had to serve the whole team without turning into a
-        wall of data, so the depth is split across tabs. Details is the
-        overview: specs and connectors, a 24-hour metric chart, location,
-        supported protocols and integrations, the pass/fail breakdown, and
-        network traffic.
-      - >-
-        Logs is the raw event stream with severity tags and payloads. Issues
-        ranks the device's own problems by impact. The timeline panel on the
-        right stays pinned across the tabs, so the device's runs are always in
-        view.
-    screens:
+  - screens:
       - src: ../../assets/projects/timetick/device-details.png
         alt: Device page, Details tab — specs, metrics, map, network traffic, and a run timeline
       - src: ../../assets/projects/timetick/device-logs.png
         alt: Device page, Logs tab — timestamps, size, severity tags, and raw payloads
       - src: ../../assets/projects/timetick/device-issues.png
         alt: Device page, Issues tab — problems ranked by occurrence, scoring, and impact
-  - title: Assembling a run
-    body:
-      - >-
-        A run is a set of tests fired at devices. Picking from several hundred
-        had to work both for someone who knows exactly what they need and for
-        someone still browsing, so the picker keeps the folder tree, tags and
-        priorities, and adds search, filters and a running count of what is
-        selected.
-      - >-
-        Once the run starts, that same list becomes the progress view: status
-        per test, repeat counts, who is assigned, and a summary bar splitting
-        passed, failed, skipped, in progress, and not started.
-    screens:
+  - screens:
       - src: ../../assets/projects/timetick/run-create.png
         alt: Creating a run — picking tests from a folder tree with tags and filters
       - src: ../../assets/projects/timetick/run-tests.png
         alt: A run before start — tests grouped by suite with assignees
       - src: ../../assets/projects/timetick/run-progress.png
         alt: A run in progress — summary bar and per-test status
-  - title: The test library
-    body:
-      - >-
-        Tests are kept in two views because they are used in two ways. The tree
-        of suites and folders is for building structure and running a whole
-        branch at once; the flat table with parent folder, priority and tags is
-        for finding one test among hundreds.
-      - >-
-        A test itself is a document — requirements, steps, expected results —
-        which is why the last screen here is so tall. Open it to scroll the
-        whole thing.
-    screens:
+  - screens:
       - src: ../../assets/projects/timetick/tests-suites.png
         alt: Test suites as a tree of folders with inline actions
       - src: ../../assets/projects/timetick/tests-table.png
@@ -154,20 +132,7 @@ sections:
       - src: ../../assets/projects/timetick/test-editor.png
         alt: A test with requirements, steps, and expected results
         full: ../../assets/projects/timetick/test-editor-full.png
-  - title: From an error to a task
-    body:
-      - >-
-        Issues is where monitoring turns into work. The list ranks problems by
-        how often they occur, a letter score with its trend, the share of
-        affected devices, and the error count with a sparkline — so the one
-        worth opening first is visible without reading a single row.
-      - >-
-        Inside, the platform explains itself: what the error means, an
-        automatic summary of the model and the hours it clusters around, and
-        charts breaking the errors down by device type. From there the problem
-        becomes a ticket, with the side panel carrying the description, how to
-        resolve it, a maintenance plan, and why it matters.
-    screens:
+  - screens:
       - src: ../../assets/projects/timetick/issues-list.png
         alt: Issues ranked by occurrence, scoring, impact, and error trend
       - src: ../../assets/projects/timetick/issue-insights.png
@@ -175,4 +140,19 @@ sections:
         full: ../../assets/projects/timetick/issue-insights-full.png
       - src: ../../assets/projects/timetick/issue-tickets.png
         alt: Issue tickets with a side panel explaining the error and how to resolve it
+  - title: Outcome
+    body:
+      - >-
+        Over the course of the project, I designed more than 150 screens,
+        connected them in an interactive prototype, and built a design system
+        based on MUI with custom components.
+      - >-
+        The platform launched and gained real clients. One of them, EV charger
+        manufacturer Elinta Charge, used Timetick to test charging scenarios,
+        security, and remote software updates.
+      - >-
+        In a published customer case study, Elinta Charge’s Senior Testing
+        Engineer reported faster and more thorough testing and described the
+        interface as intuitive. This feedback reflects the work of the whole
+        team, including the interface I designed.
 ---

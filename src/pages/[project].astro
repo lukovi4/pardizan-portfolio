@@ -1,5 +1,4 @@
 ---
-import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Header from '../components/Header.astro';
@@ -34,11 +33,6 @@ const fields = [
   role && { label: 'Role', value: role },
   roles?.length && { label: 'Scope', value: roles.join(', ') },
 ].filter(Boolean) as { label: string; value: string }[];
-
-// Раскладка ряда определяется ориентацией первого скрина: мобильные экраны
-// вертикальные — три в ряд, веб горизонтальный — один на всю ширину.
-const isWide = (screens?: { src: ImageMetadata }[]) =>
-  !!screens?.length && screens[0].src.width > screens[0].src.height;
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
@@ -83,34 +77,21 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       {
         sections.map((section) => (
         <section class="chapter">
-          <div class="shell chapter-head">
-            <h2>{section.title}</h2>
-            <div class="chapter-body">
-              {section.body.map((paragraph) => (
-                <p>{paragraph}</p>
-              ))}
-              {section.note && <p class="note">{section.note}</p>}
+          {(section.title || section.heading || section.body.length > 0) && (
+            <div class="shell chapter-head">
+              <h2>{section.title}</h2>
+              <div class="chapter-body">
+                {section.heading && <h3>{section.heading}</h3>}
+                {section.body.map((paragraph) => (
+                  <p>{paragraph}</p>
+                ))}
+                {section.note && <p class="note">{section.note}</p>}
+              </div>
             </div>
-          </div>
-
-          {section.screens && section.screens.length > 0 && isWide(section.screens) && (
-            <ScreenSlider screens={section.screens} />
           )}
 
-          {section.screens && section.screens.length > 0 && !isWide(section.screens) && (
-            <ul class="shots" data-gallery>
-              {section.screens.map((screen) => (
-                <li>
-                  <Image
-                    src={screen.src}
-                    alt={screen.alt}
-                    widths={[300, 600, 900]}
-                    sizes="(max-width: 36rem) 92vw, (max-width: 56rem) 46vw, (max-width: 64rem) 340px, 302px"
-                    loading="lazy"
-                  />
-                </li>
-              ))}
-            </ul>
+          {section.screens && section.screens.length > 0 && (
+            <ScreenSlider screens={section.screens} />
           )}
         </section>
       ))
@@ -175,11 +156,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     gap: 1rem;
     align-items: baseline;
     padding-block: 0.7rem;
-    border-top: 1px solid var(--line);
-  }
-
-  .field:last-child {
-    border-bottom: 1px solid var(--line);
   }
 
   dt {
@@ -214,28 +190,39 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     margin-top: clamp(3rem, 7vw, 5rem);
   }
 
-  /* Та же сетка, что у Experience: заголовок слева, текст справа */
+  /* Заголовок слева, текст справа. Пропорция подобрана так, чтобы текстовая
+     колонка дотягивала до 800px — той же меры, что в hero и About. */
   .chapter-head {
     display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    grid-template-columns: minmax(0, 2fr) minmax(0, 7fr);
     gap: 0.5rem 2rem;
     align-items: start;
     padding-top: 1.25rem;
-    border-top: 1px solid var(--line);
   }
 
   .chapter h2 {
     font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    /* Прописные требуют разрядки: с прежним отрицательным трекингом
+       буквы слипались бы. */
+    letter-spacing: 0.04em;
+    color: #222;
+  }
+
+  .chapter-body h3 {
+    margin-bottom: 0.9rem;
+    font-weight: 700;
     font-size: 18px;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.01em;
     color: #222;
   }
 
   .chapter-body p {
     font-weight: 400;
-    font-size: 16px;
+    font-size: 18px;
     color: #222;
-    max-width: 46rem;
+    max-width: 800px;
   }
 
   .chapter-body p + p {
@@ -251,65 +238,10 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   /* ---------- Скрины: ряды по четыре, у веба — один на ряд ---------- */
   /* Шире колонки текста: она остаётся 72rem, скрины идут до 1280px.
      На узком экране потолок сам опускается до окна за вычетом полей. */
-  .shots {
-    max-width: min(1280px, 100% - 2 * var(--gutter));
-    margin-inline: auto;
-    margin-top: clamp(1.75rem, 4vw, 2.5rem);
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 24px;
-    /* Список: гасим собственный отступ браузера, раньше это делал .shell */
-    padding: 0;
-    list-style: none;
-  }
-
-  .shots.wide {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  /* Скрин ограничен и по ширине, и по высоте: он всегда должен помещаться
-     в экран целиком, как работы на главной. Высота считается так же —
-     окно минус шапка, нижняя полоса и поля. Если ограничила высота, скрин
-     становится уже колонки, поэтому центрируем. */
-  .shots :global(img) {
-    width: auto;
-    max-width: 100%;
-    height: auto;
-    max-height: calc(100dvh - 2 * var(--header-h) - 2 * var(--panel-pad));
-    justify-self: center;
-    border-radius: 14px;
-    background: var(--surface);
-  }
-
-  @media (max-width: 64rem) {
-    .shots {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  @media (max-width: 56rem) {
-    .chapter-head {
-      grid-template-columns: 1fr;
-      gap: 0.75rem;
-    }
-
-    .shots {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
-    }
-  }
-
-  @media (max-width: 36rem) {
-    .shots {
-      grid-template-columns: minmax(0, 1fr);
-    }
-  }
-
   /* ---------- Следующий кейс ---------- */
   .next {
     margin-top: clamp(3.5rem, 8vw, 5.5rem);
     padding-top: 1.25rem;
-    border-top: 1px solid var(--line);
     display: flex;
     flex-direction: column;
     gap: 0.35rem;

@@ -52,10 +52,6 @@ const sizes = `(max-width: 56rem) ${Math.round(560 * ratio)}px, ${Math.round(900
 <style>
   .strip {
     --cell-w: calc(var(--cell-h) * var(--cell-ratio));
-    /* Зазор пропорционален ячейке — иначе на большом мониторе скрины
-       высотой 900px стоят с тем же просветом, что и 540px на ноутбуке.
-       0.045 подобрано так, чтобы на ноутбуке остались привычные ~24px. */
-    --cell-gap: clamp(16px, calc(var(--cell-h) * 0.045), 48px);
 
     overflow-x: auto;
     overscroll-behavior-x: contain;
@@ -89,9 +85,20 @@ const sizes = `(max-width: 56rem) ${Math.round(560 * ratio)}px, ${Math.round(900
     list-style: none;
   }
 
-  /* Слева — место под неподвижную карточку описания */
+  /* Лента начинается от СЕРЕДИНЫ карточки описания.
+     От левого края нельзя: карточка скруглена, и в вырезах её левых углов
+     наружу лезли бы углы уехавших скринов. От правого — тоже плохо: скрин
+     обрывался ровно по краю, и у правых скруглений оставались пустые клинья.
+     Середина решает оба: до левых углов лента не достаёт, а правые углы
+     скрин закрывает собой, уходя под карточку. */
+  .strip.has-lead {
+    margin-left: calc(var(--info-w) / 2);
+  }
+
+  /* Первый скрин по-прежнему отбит от карточки на зазор: половина ширины
+     карточки компенсирует отрицательное начало ленты. */
   .strip.has-lead ul {
-    padding-left: calc(var(--info-w) + var(--cell-gap));
+    padding-left: calc(var(--info-w) / 2 + var(--cell-gap));
   }
 
   .strip li {
@@ -112,12 +119,6 @@ const sizes = `(max-width: 56rem) ${Math.round(560 * ratio)}px, ${Math.round(900
     cursor: zoom-in;
   }
 
-  /* Мобильная версия делается отдельно — там зазор пока прежний */
-  @media (max-width: 56rem) {
-    .strip {
-      --cell-gap: 16px;
-    }
-  }
 </style>
 
 <script>

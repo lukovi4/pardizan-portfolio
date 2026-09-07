@@ -60,8 +60,13 @@ const projects = defineCollection({
       sections: z
         .array(
           z.object({
-            title: z.string(),
-            body: z.array(z.string()),
+            // Заголовок и текст необязательны: раздел может состоять
+            // из одних скринов и идти сразу за предыдущим.
+            title: z.string().optional(),
+            // Подзаголовок над текстом в правой колонке. Нужен, когда слева
+            // стоит общее название группы, а справа — конкретное решение.
+            heading: z.string().optional(),
+            body: z.array(z.string()).default([]),
             // Сноска мелким шрифтом под абзацами
             note: z.string().optional(),
             screens: z
