@@ -35,6 +35,22 @@ const fields = [
 ].filter(Boolean) as { label: string; value: string }[];
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+// Подряд идущие разделы с одинаковым заголовком — это один раздел: слева
+// заголовок печатается один раз, справа блоки идут друг за другом.
+// Так «Key decisions» перестаёт повторяться на каждый подзаголовок.
+// Часть со скринами склейку обрывает: иначе слайдер уехал бы из-под своего
+// текста в конец раздела.
+type Section = (typeof sections)[number];
+const groups: { title?: string; parts: Section[] }[] = [];
+
+for (const section of sections) {
+  const group = groups.at(-1);
+  const open = group && !group.parts.at(-1)?.screens?.length;
+
+  if (open && section.title && section.title === group.title) group.parts.push(section);
+  else groups.push({ title: section.title, parts: [section] });
+}
 ---
 
 <Base title={`${name} — Evgeny Lukovich`} description={tagline} paged>
@@ -75,23 +91,27 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     {/* Описание длиннее экрана — прокручивается целиком, как Experience */}
     <div class="chapters screen">
       {
-        sections.map((section) => (
+        groups.map((group) => (
         <section class="chapter">
-          {(section.title || section.heading || section.body.length > 0) && (
+          {group.parts.some((part) => part.title || part.heading || part.body.length > 0) && (
             <div class="shell chapter-head">
-              <h2>{section.title}</h2>
+              <h2>{group.title}</h2>
               <div class="chapter-body">
-                {section.heading && <h3>{section.heading}</h3>}
-                {section.body.map((paragraph) => (
-                  <p>{paragraph}</p>
+                {group.parts.map((part) => (
+                  <div class="part">
+                    {part.heading && <h3>{part.heading}</h3>}
+                    {part.body.map((paragraph) => (
+                      <p>{paragraph}</p>
+                    ))}
+                    {part.note && <p class="note">{part.note}</p>}
+                  </div>
                 ))}
-                {section.note && <p class="note">{section.note}</p>}
               </div>
             </div>
           )}
 
-          {section.screens && section.screens.length > 0 && (
-            <ScreenSlider screens={section.screens} />
+          {group.parts.at(-1)?.screens?.length > 0 && (
+            <ScreenSlider screens={group.parts.at(-1).screens} />
           )}
         </section>
       ))
@@ -208,6 +228,12 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
        буквы слипались бы. */
     letter-spacing: 0.04em;
     color: #222;
+  }
+
+  /* Блоки одного раздела отбиты друг от друга сильнее, чем абзацы внутри
+     блока: иначе подзаголовок липнет к предыдущему тексту. */
+  .chapter-body .part + .part {
+    margin-top: 1.75rem;
   }
 
   .chapter-body h3 {

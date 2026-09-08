@@ -19,7 +19,10 @@ const current = (key: Props['active']) => (active === key ? 'true' : undefined);
 
 <header class="site-header">
   <div class="shell inner">
-    <a class="wordmark" href={`${base}/#hero`}>Evgeny Lukovich</a>
+    <div class="brand">
+      <a class="wordmark" href={`${base}/#hero`}>Evgeny Lukovich</a>
+      <span class="badge cap">Site in progress</span>
+    </div>
     <nav aria-label="Main">
       <a href={`${base}/#cases`} data-nav="work" aria-current={current('work')}>Work</a>
       <a href={`${base}/#experience`} data-nav="experience" aria-current={current('experience')}>
@@ -51,11 +54,26 @@ const current = (key: Props['active']) => (active === key ? 'true' : undefined);
     height: 3.75rem;
   }
 
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
   .wordmark {
     font-weight: 600;
     font-size: 1rem;
     letter-spacing: -0.01em;
     text-decoration: none;
+  }
+
+  /* Пометка о том, что сайт ещё дорабатывается */
+  .badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    background: var(--brand);
+    /* .cap красит текст серым — на жёлтом нужен основной цвет */
+    color: var(--ink);
   }
 
   nav {
@@ -71,6 +89,14 @@ const current = (key: Props['active']) => (active === key ? 'true' : undefined);
     color: var(--muted);
     text-decoration: none;
     padding-block: 0.35rem;
+  }
+
+  /* На узких экранах шапке и без бейджа тесно: знак сайта и меню занимают
+     всю строку. Там пометку прячем — как и нижнюю полосу. */
+  @media (max-width: 56rem) {
+    .badge {
+      display: none;
+    }
   }
 
   nav a:hover,
