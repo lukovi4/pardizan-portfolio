@@ -47,12 +47,16 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     }
   </dl>
 
-  <a class="btn" href={`${base}/${slug}`}>See case <span aria-hidden="true">→</span></a>
+  <a class="cta" href={`${base}/${slug}`}>
+    <span class="label">See case</span>
+    <span class="arrow" aria-hidden="true">→</span>
+  </a>
 </div>
 
 <style>
   .info {
     /* Ширину и высоту карточки задаёт родительский кейс. */
+    position: relative;
     width: var(--info-w);
     height: var(--cell-h);
     display: flex;
@@ -73,12 +77,12 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
   .summary {
     margin-top: 0.7rem;
-    color: var(--muted);
-    font-size: 0.9rem;
+    color: var(--ink);
+    font-size: 15px;
     line-height: 1.5;
   }
 
-  /* Поля кейса: слева подпись, справа значение, строки разделены линиями */
+  /* Поля кейса: слева подпись, справа значение */
   .fields {
     margin: 1.75rem 0 0;
   }
@@ -89,11 +93,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     gap: 1rem;
     align-items: baseline;
     padding-block: 0.7rem;
-    border-top: 1px solid var(--line);
-  }
-
-  .field:last-child {
-    border-bottom: 1px solid var(--line);
   }
 
   dt {
@@ -114,6 +113,9 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   }
 
   .links a {
+    /* Над растянутой ссылкой на кейс — иначе клик по ним уводил бы на неё */
+    position: relative;
+    z-index: 1;
     text-decoration: none;
     border-bottom: 1px solid var(--line);
   }
@@ -123,10 +125,72 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     color: var(--accent-ink);
   }
 
-  /* Кнопка прижата к низу карточки */
-  .btn {
+  /* Ссылка на кейс прижата к низу карточки. В покое видна одна стрелка у
+     левого края; при наведении на карточку слева проявляется подпись и
+     отодвигает стрелку ровно на свою ширину. Фона у ссылки нет.
+     Колонка подписи раскрывается от 0fr к 1fr: в отличие от width: auto
+     это анимируется, а ширина по содержимому получается сама — потому и
+     сетка, а не флексбокс. fit-content нужен, чтобы 1fr считался по тексту,
+     а не растягивался во всю карточку. */
+  .cta {
     margin-top: auto;
-    justify-content: center;
+    width: fit-content;
+    display: grid;
+    grid-template-columns: 0fr auto;
+    /* Зазор до стрелки раскрывается вместе с подписью: держи его
+       постоянным — и в покое стрелка стояла бы в 20px от края. */
+    column-gap: 0;
+    align-items: center;
     font-size: 0.95rem;
+    text-decoration: none;
+    color: var(--ink);
+    /* Кривая с длинным выбегом: движение начинается быстро и почти
+       останавливается к концу — стрелка мягко доезжает до места. */
+    transition:
+      grid-template-columns 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+      column-gap 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .info:hover .cta,
+  .cta:focus-visible {
+    grid-template-columns: 1fr auto;
+    column-gap: 20px;
+  }
+
+  /* Кликается вся карточка: псевдоэлемент растягивает ссылку на её площадь.
+     Так в разметке не появляется ссылок внутри ссылки — Media-ссылки выше
+     остаются самостоятельными. */
+  .cta::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Подпись живёт в потоке всегда — иначе её не прочитает скринридер.
+     В покое колонка сжата в ноль, и подпись обрезается целиком: без
+     min-width: 0 сетка не дала бы ей стать уже своего текста. */
+  .label {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .info:hover .label,
+  .cta:focus-visible .label {
+    opacity: 1;
+  }
+
+  /* Без мыши наведения не бывает — там подпись видна сразу */
+  @media (hover: none) {
+    .cta {
+      grid-template-columns: 1fr auto;
+      column-gap: 20px;
+    }
+
+    .label {
+      opacity: 1;
+    }
   }
 </style>

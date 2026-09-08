@@ -110,10 +110,6 @@ const cases = projects.filter((project) => project.data.screens?.length);
     {cases.map((project, i) => <ProjectShowcase project={project} anchor={i === 0 ? 'cases' : undefined} />)}
 
     <section id="experience" class="experience screen shell">
-      <div class="section-head">
-        <h2>Experience</h2>
-        <span class="cap">01–{String(experience.length).padStart(2, '0')}</span>
-      </div>
       <ol>
         {
           experience.map((e) => (
@@ -318,18 +314,18 @@ const cases = projects.filter((project) => project.data.screens?.length);
     padding: 0;
   }
 
+  /* Подсветка при наведении выходит за текст на 20px со всех сторон: поле
+     даёт запас, а отрицательные поля по горизонтали возвращают текст на
+     место — колонки остаются на общей сетке страницы. */
   .experience > ol > li {
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
     gap: 0.5rem 2rem;
     align-items: baseline;
-    padding-block: 1.4rem;
-    border-bottom: 1px solid var(--line);
+    padding: 20px;
+    margin-inline: -20px;
+    border-radius: 14px;
     transition: background 0.2s ease;
-  }
-
-  .experience > ol > li:last-child {
-    border-bottom: 0;
   }
 
   .experience > ol > li:hover {
