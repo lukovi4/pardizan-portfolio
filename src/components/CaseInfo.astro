@@ -9,11 +9,13 @@ const { project } = Astro.props;
 const { name, slug, summary, roles, years, role, links } = project.data;
 
 // Поля карточки: подпись слева, значение справа
+// Scope у некоторых работ занимает семь строк — на невысоком окне он
+// обрезается, остальные поля показываются целиком.
 const fields = [
   years && { label: 'Years', value: years },
   role && { label: 'Role', value: role },
-  roles?.length && { label: 'Scope', value: roles.join(', ') },
-].filter(Boolean) as { label: string; value: string }[];
+  roles?.length && { label: 'Scope', value: roles.join(', '), long: true },
+].filter(Boolean) as { label: string; value: string; long?: boolean }[];
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
@@ -25,7 +27,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   <dl class="fields">
     {
       fields.map((field) => (
-        <div class="field">
+        <div class:list={['field', field.long && 'long']}>
           <dt>{field.label}</dt>
           <dd>{field.value}</dd>
         </div>
@@ -61,7 +63,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     height: var(--cell-h);
     display: flex;
     flex-direction: column;
-    padding: 40px;
+    padding: var(--card-pad, 40px);
     /* Карточка белая: под работами лежит цветная подложка, и белое поле
        описания отделяется от неё само. */
     background: var(--paper);
@@ -75,16 +77,70 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     line-height: 1.15;
   }
 
+  /* Высота карточки задана лентой, а описание у работ разной длины. На
+     невысоком окне текст не помещался и вываливался за карточку, поэтому
+     он обрезается: сколько влезло — столько показано, остальное читается
+     на странице кейса. Число строк задано ступенями по высоте окна ниже.
+     Сжатие флексом — страховка на случай, когда даже это не спасает:
+     переполниться карточка не должна ни при каких размерах. */
   .summary {
     margin-top: 0.7rem;
     color: var(--ink);
     font-size: 15px;
     line-height: 1.5;
+    flex: 0 1 auto;
+    min-height: 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--summary-lines, 999);
+    overflow: hidden;
   }
 
-  /* Поля кейса: слева подпись, справа значение */
+  /* Ступени подобраны по самой длинной работе: на каждой высоте описание и
+     поля кончаются раньше, чем кончается место под ними. */
+  @media (max-height: 900px) {
+    .info {
+      --summary-lines: 8;
+      --field-lines: 3;
+    }
+  }
+
+  @media (max-height: 820px) {
+    .info {
+      --summary-lines: 6;
+    }
+  }
+
+  @media (max-height: 740px) {
+    .info {
+      --summary-lines: 4;
+      --field-lines: 2;
+    }
+  }
+
+  @media (max-height: 660px) {
+    .info {
+      --summary-lines: 3;
+      --field-lines: 1;
+      --card-pad: 28px;
+    }
+  }
+
+  @media (max-height: 580px) {
+    .info {
+      --summary-lines: 2;
+      --card-pad: 24px;
+    }
+  }
+
+  /* Поля кейса: слева подпись, справа значение. Список сжимается вместе с
+     описанием: у работ вроде Lastik один только Scope занимает семь строк,
+     и на невысоком окне поля выталкивали кнопку за карточку. */
   .fields {
     margin: 1.75rem 0 0;
+    flex: 0 1 auto;
+    min-height: 0;
+    overflow: hidden;
   }
 
   .field {
@@ -104,6 +160,15 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     margin: 0;
     font-size: 0.9rem;
     color: #222;
+  }
+
+  /* Длинное поле обрезается по строкам, как и описание. Короткие — Years,
+     Role — показываются целиком: обрезать в них нечего. */
+  .field.long dd {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--field-lines, 999);
+    overflow: hidden;
   }
 
   .links {
@@ -180,6 +245,34 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   .info:hover .label,
   .cta:focus-visible .label {
     opacity: 1;
+  }
+
+  /* Телефон и планшет: ленты рядом нет, карточка занимает всю ширину
+     колонки и растёт по тексту — обрезать описание незачем. */
+  @media (max-width: 56rem) {
+    .info {
+      width: 100%;
+      /* На планшете строка во всю ширину была бы слишком длинной для
+         чтения — мера та же, что у текста на странице кейса. */
+      max-width: 40rem;
+      height: auto;
+      padding: 0;
+      /* Ступени по высоте окна ниже сюда не относятся: место под текст
+         здесь ничем не ограничено, обрезать нечего. */
+      --summary-lines: 999;
+      --field-lines: 999;
+    }
+
+    /* Наводить нечем и незачем: подпись стоит раскрытой сразу */
+    .cta {
+      margin-top: 1.75rem;
+      grid-template-columns: 1fr auto;
+      column-gap: 20px;
+    }
+
+    .label {
+      opacity: 1;
+    }
   }
 
   /* Без мыши наведения не бывает — там подпись видна сразу */

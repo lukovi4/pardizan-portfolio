@@ -23,7 +23,19 @@ const current = (key: Props['active']) => (active === key ? 'true' : undefined);
       <a class="wordmark" href={`${base}/#hero`}>Evgeny Lukovich</a>
       <span class="badge cap">Site in progress</span>
     </div>
-    <nav aria-label="Main">
+    <button
+      class="burger"
+      type="button"
+      aria-label="Menu"
+      aria-expanded="false"
+      aria-controls="site-nav"
+      data-burger
+    >
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </button>
+    <button class="overlay" type="button" tabindex="-1" aria-hidden="true" data-menu-overlay></button>
+    <nav id="site-nav" aria-label="Main">
       <a href={`${base}/#cases`} data-nav="work" aria-current={current('work')}>Work</a>
       <a href={`${base}/#experience`} data-nav="experience" aria-current={current('experience')}>
         Experience
@@ -41,6 +53,16 @@ const current = (key: Props['active']) => (active === key ? 'true' : undefined);
     position: fixed;
     inset: 0 0 auto;
     z-index: 10;
+  }
+
+  /* Подложка шапки вынесена в псевдоэлемент: backdrop-filter на самой шапке
+     делает её точкой отсчёта для position: fixed внутри, и шторка меню
+     считала бы края не по экрану, а по строке шапки. */
+  .site-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
     background: color-mix(in srgb, var(--paper) 90%, transparent);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -91,11 +113,115 @@ const current = (key: Props['active']) => (active === key ? 'true' : undefined);
     padding-block: 0.35rem;
   }
 
-  /* На узких экранах шапке и без бейджа тесно: знак сайта и меню занимают
-     всю строку. Там пометку прячем — как и нижнюю полосу. */
+  /* Кнопка меню: две линии, складывающиеся в крестик. На широких экранах
+     не нужна — меню и так стоит строкой. */
+  .burger {
+    display: none;
+    /* Над затемнением: крестик должен оставаться нажимаемым */
+    position: relative;
+    z-index: 25;
+    width: 2.25rem;
+    height: 2.25rem;
+    margin-right: -0.5rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .burger span {
+    position: absolute;
+    left: 50%;
+    width: 1.25rem;
+    height: 2px;
+    margin-left: -0.625rem;
+    background: var(--ink);
+    transition:
+      transform 0.25s ease,
+      opacity 0.2s ease;
+  }
+
+  .burger span:first-child {
+    top: calc(50% - 4px);
+  }
+
+  .burger span:last-child {
+    top: calc(50% + 2px);
+  }
+
+  /* Открытое меню: линии сходятся в крестик */
+  .site-header.is-open .burger span:first-child {
+    transform: translateY(3px) rotate(45deg);
+  }
+
+  .site-header.is-open .burger span:last-child {
+    transform: translateY(-3px) rotate(-45deg);
+  }
+
+  /* Затемнение под шторкой. Живёт всегда, но видно его только с открытым
+     меню — так переход гасится плавно, а не пропадает вместе с элементом. */
+  :global(body.menu-open) {
+    overflow: hidden;
+  }
+
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 15;
+    background: rgb(0 0 0 / 0.5);
+    border: 0;
+    padding: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.3s ease,
+      visibility 0.3s;
+  }
+
+  .site-header.is-open .overlay {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Узкие экраны: пункты уезжают в шторку у правого края, в строке
+     остаются знак сайта, пометка и кнопка. */
   @media (max-width: 56rem) {
-    .badge {
-      display: none;
+    .burger,
+    .overlay {
+      display: block;
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 20;
+      width: min(20rem, 78vw);
+      flex-direction: column;
+      gap: 0;
+      /* Сверху — место под строку шапки, чтобы первый пункт не оказался
+         под знаком сайта и кнопкой */
+      padding: calc(var(--header-h) + 1.25rem) var(--gutter) 2rem;
+      background: var(--paper);
+      /* Закрытая шторка не просто сдвинута: без visibility по ней можно
+         было бы попасть табом. */
+      visibility: hidden;
+      transform: translateX(100%);
+      transition:
+        transform 0.3s ease,
+        visibility 0.3s;
+    }
+
+    .site-header.is-open nav {
+      visibility: visible;
+      transform: none;
+    }
+
+    nav a {
+      padding-block: 0.7rem;
+      font-size: 0.8rem;
     }
   }
 
@@ -211,9 +337,55 @@ const current = (key: Props['active']) => (active === key ? 'true' : undefined);
     sections.forEach(([section]) => io.observe(section));
   };
 
+  // Меню под кнопкой на узких экранах. Состояние живёт классом на шапке:
+  // и стили, и разметка читают одно и то же.
+  // Меню под кнопкой на узких экранах. Состояние живёт классом на шапке:
+  // и стили, и разметка читают одно и то же. Шапку ищем на каждом вызове —
+  // после перехода между страницами элемент новый, а слушатели ниже общие.
+  const setMenu = (open: boolean) => {
+    const header = document.querySelector<HTMLElement>('.site-header');
+    if (!header) return;
+    header.classList.toggle('is-open', open);
+    header.querySelector('[data-burger]')?.setAttribute('aria-expanded', String(open));
+    // Под открытой шторкой страница не прокручивается
+    document.body.classList.toggle('menu-open', open);
+  };
+
+  const setupBurger = () => {
+    const header = document.querySelector<HTMLElement>('.site-header');
+    const burger = header?.querySelector<HTMLButtonElement>('[data-burger]');
+    if (!header || !burger || header.dataset.burgerReady) return;
+    header.dataset.burgerReady = '1';
+
+    burger.addEventListener('click', () => setMenu(!header.classList.contains('is-open')));
+
+    // Клик по пункту уводит на раздел — меню закрывается само
+    header
+      .querySelectorAll('nav a')
+      .forEach((link) => link.addEventListener('click', () => setMenu(false)));
+
+    header.querySelector('[data-menu-overlay]')?.addEventListener('click', () => setMenu(false));
+  };
+
+  // Клик мимо шапки, Escape и возврат к широкому окну закрывают меню.
+  // Вешаются один раз на весь сеанс: элементы шапки они ищут сами.
+  document.addEventListener('click', (event) => {
+    const header = document.querySelector('.site-header');
+    if (header && !header.contains(event.target as Node)) setMenu(false);
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') setMenu(false);
+  });
+
+  matchMedia('(min-width: 56.01rem)').addEventListener('change', (event) => {
+    if (event.matches) setMenu(false);
+  });
+
   const setup = () => {
     scrollToCurrentHash();
     setupNavSpy();
+    setupBurger();
   };
 
   setup();

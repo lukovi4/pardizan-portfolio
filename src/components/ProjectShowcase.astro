@@ -74,17 +74,19 @@ const { screens = [], backdrop } = project.data;
     --strip-tail: var(--panel-pad);
   }
 
-  /* Без постраничности подложки нет — работы живут по обычным полям страницы */
+  /* Без постраничности подложки нет — работы живут по обычным полям страницы.
+     Лента скринов здесь не показывается: на телефоне она начиналась за правым
+     краем карточки, и от работы была видна полоска в несколько пикселей.
+     Осталось описание во всю ширину — скрины смотрят на странице кейса. */
   @media (max-width: 56rem) {
     .case {
       padding-block: 2rem;
       padding-inline: var(--gutter);
-      --cell-h: clamp(280px, 62dvh, 560px);
-      --cell-gap: 16px;
-      --strip-bleed: calc(-1 * var(--gutter));
-      --strip-tail: var(--gutter);
     }
 
+    .case :global(.strip) {
+      display: none;
+    }
   }
 
   .case-body {
@@ -101,5 +103,14 @@ const { screens = [], backdrop } = project.data;
     top: 0;
     left: 0;
     z-index: 2;
+  }
+
+  /* Ленты под карточкой больше нет — описание возвращается в поток.
+     Правило стоит после основного: медиа-запрос не добавляет веса, и выше
+     по файлу его перебило бы absolute. */
+  @media (max-width: 56rem) {
+    .pin {
+      position: static;
+    }
   }
 </style>

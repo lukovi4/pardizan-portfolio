@@ -446,6 +446,12 @@ const cases = projects.filter((project) => project.data.screens?.length);
 
   /* ---------- Адаптив ---------- */
   @media (max-width: 56rem) {
+    /* Крестик стоит в углу окна, а на узком экране заголовок доходит до
+       самого края и крестик ложится прямо на буквы — там он не нужен. */
+    .hero::before {
+      content: none;
+    }
+
     .experience > ol > li {
       grid-template-columns: 1fr;
     }
